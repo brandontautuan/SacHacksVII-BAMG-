@@ -1,0 +1,16 @@
+# Nested clone (do not push)
+SacHacksVII-BAMG-/
+
+# Census API key (do not commit)
+.env
+*.env.local
+
+# Cached ACS data and output
+data/
+top_zip_codes.csv
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/

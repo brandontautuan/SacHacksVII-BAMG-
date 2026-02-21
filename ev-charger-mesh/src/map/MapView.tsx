@@ -10,7 +10,7 @@ import { MapboxOverlay } from '@deck.gl/mapbox'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import { buildScatterLayer, buildLineLayer } from './layers'
 import { DAVIS_BOUNDS, INITIAL_VIEW_STATE } from './constants'
-import type { ChargerNode, EdgeCoords } from '@/data/types'
+import type { Station, EdgeCoords } from '@/data/types'
 
 /** Free OSM vector styles (no API key). Primary: Carto dark. Fallback: MapLibre demo. */
 const MAP_STYLE_DARK =
@@ -18,17 +18,16 @@ const MAP_STYLE_DARK =
 const MAP_STYLE_FALLBACK = 'https://demotiles.maplibre.org/style.json'
 
 export interface MapViewProps {
-  chargers: ChargerNode[]
+  stations: Station[]
   edges: EdgeCoords[]
   meshVisible: boolean
   filterType: string | null
-  /** When this value changes, the map flies to initial view (for Reset view button). */
   resetTrigger?: number
-  onHover: (charger: ChargerNode | null, coords: { x: number; y: number }) => void
+  onHover: (station: Station | null, coords: { x: number; y: number }) => void
 }
 
 export function MapView({
-  chargers,
+  stations,
   edges,
   meshVisible,
   filterType,
@@ -41,13 +40,13 @@ export function MapView({
   const [mapStyle, setMapStyle] = useState(MAP_STYLE_DARK)
 
   const layers = useMemo(() => {
-    const scatter = buildScatterLayer(chargers, filterType)
+    const scatter = buildScatterLayer(stations, filterType)
     const line = buildLineLayer(edges, meshVisible)
     return [scatter, line].filter(Boolean)
-  }, [chargers, edges, meshVisible, filterType])
+  }, [stations, edges, meshVisible, filterType])
 
   const handleHover = useCallback(
-    (info: { object?: ChargerNode; x?: number; y?: number }) => {
+    (info: { object?: Station; x?: number; y?: number }) => {
       onHover(info.object ?? null, { x: info.x ?? 0, y: info.y ?? 0 })
     },
     [onHover]

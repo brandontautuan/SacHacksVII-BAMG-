@@ -1,27 +1,22 @@
 /**
- * Deck.gl layer factories: scatter plot for charger nodes (size by power_kw,
- * color by charger_type) and line layer for mesh edges.
+ * Deck.gl layer factories: scatter plot for stations (one point per station),
+ * line layer for mesh edges. Picked object is the full Station (with 5 chargers).
  */
 
 import { ScatterplotLayer, LineLayer } from '@deck.gl/layers'
-import type { ChargerNode, EdgeCoords } from '@/data/types'
+import type { Station, EdgeCoords } from '@/data/types'
 
-/** Color by charger_type for consistent encoding. */
 const TYPE_COLOR: Record<string, [number, number, number]> = {
   'DC Fast': [255, 100, 80],
   'Level 2': [80, 180, 220],
   'Level 1': [120, 220, 120],
 }
-
 const DEFAULT_COLOR: [number, number, number] = [180, 180, 180]
-/** Failed charger: dark red. */
-const FAILED_COLOR: [number, number, number] = [180, 50, 50]
 
 function colorForType(t: string): [number, number, number] {
   return TYPE_COLOR[t] ?? DEFAULT_COLOR
 }
 
-/** Min/max node size in pixels; scale by power_kw (e.g. 22–350 kW). */
 const MIN_RADIUS = 6
 const MAX_RADIUS = 28
 const POWER_MIN = 20
@@ -33,17 +28,17 @@ function radiusForPower(power_kw: number): number {
   return MIN_RADIUS + clamped * (MAX_RADIUS - MIN_RADIUS)
 }
 
-export function buildScatterLayer(chargers: ChargerNode[], filterType: string | null) {
+export function buildScatterLayer(stations: Station[], filterType: string | null) {
   const data = filterType
-    ? chargers.filter((c) => c.charger_type === filterType)
-    : chargers
+    ? stations.filter((s) => s.charger_type === filterType)
+    : stations
 
-  return new ScatterplotLayer<ChargerNode>({
+  return new ScatterplotLayer<Station>({
     id: 'charger-nodes',
     data,
     getPosition: (d) => [d.longitude, d.latitude, 0],
     getRadius: (d) => radiusForPower(d.power_kw),
-    getFillColor: (d) => (d.status === 'failed' ? FAILED_COLOR : colorForType(d.charger_type)),
+    getFillColor: (d) => colorForType(d.charger_type),
     radiusMinPixels: 4,
     radiusMaxPixels: 40,
     pickable: true,

@@ -2,31 +2,40 @@
  * Shared types for EV charger data and graph structures.
  */
 
+/** One physical outlet/machine at a station. Simulation fields per charger. */
 export interface Charger {
+  machine_id: string
+  /** 1 = new, 0 = near failure */
+  hardware_state: 0 | 1
+  /** 0–100 */
+  utilization_rate: number
+  /** 0–100 */
+  grid_stress: number
+  /** °C */
+  ambient_temperature: number
+  connector_cycles: number
+  /** days until/since maintenance */
+  maintenance_gap: number
+}
+
+/** One map point: a station with location and exactly 5 chargers. */
+export interface Station {
+  id: string
+  latitude: number
+  longitude: number
+  power_kw: number
+  charger_type: string
+  chargers: Charger[]
+}
+
+/** Raw row from chargers.json (before generating 5 chargers per station). */
+export interface StationInput {
   id: string
   latitude: number
   longitude: number
   power_kw: number
   charger_type: string
 }
-
-/** Simulation state for one charger (stress vars 0–1, status, optional last hazard for tooltip). */
-export interface ChargerSimState {
-  status: 'operational' | 'failed'
-  hardware_state: number
-  utilization_rate: number
-  grid_stress: number
-  ambient_temperature: number
-  connector_cycles: number
-  maintenance_gap: number
-  install_day: number
-  failed_at_day?: number
-  last_p_fail?: number
-  last_lambda_d?: number
-}
-
-/** Charger plus simulation state: one object per node for map and tooltip. */
-export type ChargerNode = Charger & ChargerSimState
 
 /** Edge as source → target coordinate pairs for LineLayer. */
 export interface EdgeCoords {

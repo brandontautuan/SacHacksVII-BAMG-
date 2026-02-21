@@ -1,20 +1,19 @@
 /**
- * Tooltip shown when hovering a charger node. Displays id, power, type, and sim state.
+ * Tooltip when hovering a station: shows station id and a breakdown of all 5
+ * chargers (status icon, machine_id, utilization %, grid_stress, maintenance).
+ * Dark theme, position: fixed, inline styles only.
  */
 
-import type { ChargerNode } from '@/data/types'
+import type { Charger, Station } from '@/data/types'
 
 export interface TooltipProps {
-  charger: ChargerNode | null
-  currentDay: number
+  station: Station | null
   x: number
   y: number
 }
 
-export function Tooltip({ charger, currentDay, x, y }: TooltipProps) {
-  if (!charger) return null
-
-  const age = Math.max(0, currentDay - charger.install_day)
+export function Tooltip({ station, x, y }: TooltipProps) {
+  if (!station) return null
 
   return (
     <div
@@ -27,24 +26,58 @@ export function Tooltip({ charger, currentDay, x, y }: TooltipProps) {
         pointerEvents: 'none',
         background: 'rgba(20, 20, 24, 0.95)',
         color: '#e8e8e8',
-        padding: '10px 14px',
+        padding: '12px 14px',
         borderRadius: 8,
         fontSize: 13,
         fontFamily: 'system-ui, sans-serif',
         boxShadow: '0 4px 12px rgba(0,0,0,0.4)',
         border: '1px solid rgba(255,255,255,0.08)',
+        minWidth: 260,
       }}
     >
-      <div style={{ fontWeight: 600, marginBottom: 4 }}>{charger.id}</div>
-      <div>Power: {charger.power_kw} kW</div>
-      <div>Type: {charger.charger_type}</div>
-      <div style={{ marginTop: 6, paddingTop: 6, borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-        <div>Status: {charger.status}</div>
-        <div>Day: {currentDay} · Age: {age}d</div>
-        <div>Hardware: {(charger.hardware_state * 100).toFixed(1)}%</div>
-        {charger.last_p_fail != null && (
-          <div>P_fail: {(charger.last_p_fail * 100).toFixed(2)}%</div>
-        )}
+      <div style={{ fontWeight: 600, marginBottom: 8 }}>
+        {station.id}
+      </div>
+      <div style={{ fontSize: 12, opacity: 0.9, marginBottom: 8 }}>
+        {station.power_kw} kW · {station.charger_type}
+      </div>
+      {station.chargers.map((c) => (
+        <ChargerRow key={c.machine_id} charger={c} />
+      ))}
+    </div>
+  )
+}
+
+function ChargerRow({ charger }: { charger: Charger }) {
+  const isHealthy = charger.hardware_state === 1
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 10,
+        padding: '6px 0',
+        borderTop: '1px solid rgba(255,255,255,0.08)',
+      }}
+    >
+      <div
+        style={{
+          width: 8,
+          height: 8,
+          borderRadius: '50%',
+          flexShrink: 0,
+          marginTop: 5,
+          background: isHealthy ? '#22c55e' : '#ef4444',
+        }}
+      />
+      <div style={{ flex: 1 }}>
+        <div style={{ fontWeight: 500 }}>{charger.machine_id}</div>
+        <div style={{ fontSize: 12, opacity: 0.9 }}>
+          Utilization: {charger.utilization_rate}% · Grid: {charger.grid_stress}%
+        </div>
+        <div style={{ fontSize: 12, opacity: 0.8 }}>
+          Maintenance: {charger.maintenance_gap}d gap · Cycles: {charger.connector_cycles}
+        </div>
       </div>
     </div>
   )

@@ -4,7 +4,7 @@
  */
 
 import { ScatterplotLayer, LineLayer } from '@deck.gl/layers'
-import type { Charger, EdgeCoords } from '@/data/types'
+import type { ChargerNode, EdgeCoords } from '@/data/types'
 
 /** Color by charger_type for consistent encoding. */
 const TYPE_COLOR: Record<string, [number, number, number]> = {
@@ -14,6 +14,8 @@ const TYPE_COLOR: Record<string, [number, number, number]> = {
 }
 
 const DEFAULT_COLOR: [number, number, number] = [180, 180, 180]
+/** Failed charger: dark red. */
+const FAILED_COLOR: [number, number, number] = [180, 50, 50]
 
 function colorForType(t: string): [number, number, number] {
   return TYPE_COLOR[t] ?? DEFAULT_COLOR
@@ -31,17 +33,17 @@ function radiusForPower(power_kw: number): number {
   return MIN_RADIUS + clamped * (MAX_RADIUS - MIN_RADIUS)
 }
 
-export function buildScatterLayer(chargers: Charger[], filterType: string | null) {
+export function buildScatterLayer(chargers: ChargerNode[], filterType: string | null) {
   const data = filterType
     ? chargers.filter((c) => c.charger_type === filterType)
     : chargers
 
-  return new ScatterplotLayer<Charger>({
+  return new ScatterplotLayer<ChargerNode>({
     id: 'charger-nodes',
     data,
     getPosition: (d) => [d.longitude, d.latitude, 0],
     getRadius: (d) => radiusForPower(d.power_kw),
-    getFillColor: (d) => colorForType(d.charger_type),
+    getFillColor: (d) => (d.status === 'failed' ? FAILED_COLOR : colorForType(d.charger_type)),
     radiusMinPixels: 4,
     radiusMaxPixels: 40,
     pickable: true,

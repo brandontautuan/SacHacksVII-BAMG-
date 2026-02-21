@@ -5,13 +5,12 @@
  */
 
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import Map from 'react-map-gl/maplibre'
+import Map, { type MapRef } from 'react-map-gl/maplibre'
 import { MapboxOverlay } from '@deck.gl/mapbox'
-import type { MapRef } from 'react-map-gl'
 import type { Map as MapLibreMap } from 'maplibre-gl'
 import { buildScatterLayer, buildLineLayer } from './layers'
 import { DAVIS_BOUNDS, INITIAL_VIEW_STATE } from './constants'
-import type { Charger, EdgeCoords } from '@/data/types'
+import type { ChargerNode, EdgeCoords } from '@/data/types'
 
 /** Free OSM vector styles (no API key). Primary: Carto dark. Fallback: MapLibre demo. */
 const MAP_STYLE_DARK =
@@ -19,13 +18,13 @@ const MAP_STYLE_DARK =
 const MAP_STYLE_FALLBACK = 'https://demotiles.maplibre.org/style.json'
 
 export interface MapViewProps {
-  chargers: Charger[]
+  chargers: ChargerNode[]
   edges: EdgeCoords[]
   meshVisible: boolean
   filterType: string | null
   /** When this value changes, the map flies to initial view (for Reset view button). */
   resetTrigger?: number
-  onHover: (charger: Charger | null, coords: { x: number; y: number }) => void
+  onHover: (charger: ChargerNode | null, coords: { x: number; y: number }) => void
 }
 
 export function MapView({
@@ -48,7 +47,7 @@ export function MapView({
   }, [chargers, edges, meshVisible, filterType])
 
   const handleHover = useCallback(
-    (info: { object?: Charger; x?: number; y?: number }) => {
+    (info: { object?: ChargerNode; x?: number; y?: number }) => {
       onHover(info.object ?? null, { x: info.x ?? 0, y: info.y ?? 0 })
     },
     [onHover]

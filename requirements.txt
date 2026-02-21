@@ -1,4 +1,0 @@
-census>=0.8
-us>=4.0
-pandas>=2.0
-requests>=2.28

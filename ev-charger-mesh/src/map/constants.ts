@@ -16,6 +16,6 @@ export const INITIAL_VIEW_STATE = {
   longitude: DAVIS_CENTER[0],
   latitude: DAVIS_CENTER[1],
   zoom: 12.5,
-  pitch: 45,
+  pitch: 0,
   bearing: 0,
 } as const

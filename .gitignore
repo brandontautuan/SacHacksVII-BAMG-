@@ -1,6 +1,9 @@
 # Nested clone (do not push)
 SacHacksVII-BAMG-/
 
+# Node
+node_modules/
+
 # Census API key (do not commit)
 .env
 *.env.local

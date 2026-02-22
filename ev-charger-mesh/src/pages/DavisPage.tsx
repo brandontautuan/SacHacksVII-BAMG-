@@ -14,7 +14,7 @@ import { tickCharger, getChargerPFail, defaultFailureConfig } from '@/sim'
 import type { Station, StationInput } from '@/data/types'
 import { setStations as syncStations } from '@/server/mockApiPlugin'
 import { startAgent, stopAgent } from '@/agent/agentService'
-import { bindStations, getDaysSaved, resetDaysSaved, type AgentEvent } from '@/sim/governor'
+import { bindStations, type AgentEvent } from '@/sim/governor'
 import { runGridAgent } from '@/agent/gridSummaryAgent'
 
 import chargersJson from '@/data/chargers.json'
@@ -76,14 +76,7 @@ export function DavisPage() {
     return [0, max <= 0 ? 0.001 : max * 1.05] as [number, number]
   }, [pfailHistory])
 
-  const chargerDaysDowntimeSaved = getDaysSaved()
-  const moneySaved = chargerDaysDowntimeSaved * 150  // $150/day per charger
-  const moneySavedFormatted = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(moneySaved)
+
 
   const resetView = useCallback(() => setResetTrigger((t) => t + 1), [])
 
@@ -93,7 +86,6 @@ export function DavisPage() {
     setIsRunning(false)
     setPfailHistory([])
     setCumulativeChargerDaysDownNoAgent(0)
-    resetDaysSaved()
     lastAppendedDayRef.current = -1
     noAgentStationsRef.current = cloneStationsForNoAgent()
   }, [])
@@ -112,8 +104,6 @@ export function DavisPage() {
   useEffect(() => {
     console.log('[DavisPage] Syncing stations, count:', stations.length)
     syncStations(stations)
-    // Keep the shared governor reference in sync
-    bindStations(stations, setStations)
   }, [stations])
 
   useEffect(() => {
@@ -184,6 +174,12 @@ export function DavisPage() {
     const SLOW_MS = 7000  // slow down when there's action
 
     const doTick = () => {
+      // Don't update stations while agent is mid-execution — it would overwrite _stationsRef
+      if (llmInFlightRef.current) {
+        tickIntervalRef.current = setTimeout(doTick, 1000)
+        return
+      }
+
       const nextDay = currentDayRef.current + 1
 
       noAgentStationsRef.current = noAgentStationsRef.current.map((s) => ({
@@ -202,13 +198,14 @@ export function DavisPage() {
         s.chargers.some(c => c.status === 'failed' || c.status === 'derated' || c.status === 'partially_operational')
       )
 
-      // Update stations in state (this also triggers bindStations via the useEffect)
+      // Update stations in state
       setStations(tickedStations)
       syncStations(tickedStations)
       setCurrentDay(nextDay)
 
-      if (hasIncident && !llmInFlightRef.current) {
-        // Slow mode: call the ReAct agent with tools
+      if (hasIncident) {
+        // Bind synchronously so agent tools see the latest data
+        bindStations(tickedStations, setStations)
         llmInFlightRef.current = true
         runGridAgent(nextDay).then(result => {
           setGridSummary(result.summary)
@@ -413,12 +410,6 @@ export function DavisPage() {
           }}
         >
           <div>{failedChargers} / {totalChargers} chargers failed</div>
-          <div style={{ marginTop: 6 }}>
-            Downtime saved: {chargerDaysDowntimeSaved} charger-days
-          </div>
-          <div style={{ marginTop: 4, fontWeight: 600 }}>
-            Agent savings: {moneySavedFormatted}
-          </div>
         </div>
       </div>
     </ErrorBoundary>

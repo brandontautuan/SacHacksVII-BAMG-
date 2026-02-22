@@ -1,11 +1,15 @@
 /**
- * Tooltip when hovering a station: shows station id and a breakdown of all 5
- * chargers (status icon, machine_id, utilization %, grid_stress, maintenance, P_fail).
- * Dark theme, position: fixed, inline styles only.
+ * Tooltip when hovering a station: shows station id and P_fail formula with
+ * live λ_d per charger. Dark theme, position: fixed, inline styles only.
  */
 
 import type { Charger, Station } from '@/data/types'
-import { getChargerPFail, defaultFailureConfig, type FailureConfig } from '@/sim'
+import {
+  getChargerLambdaContext,
+  STRESS_LABELS,
+  defaultFailureConfig,
+  type FailureConfig,
+} from '@/sim'
 
 export interface TooltipProps {
   station: Station | null
@@ -59,6 +63,11 @@ function clamp01(x: number): number {
   return Math.max(0, Math.min(1, x))
 }
 
+function fmt(v: number): string {
+  if (v === 0) return '0'
+  return v < 0.0001 ? v.toExponential(2) : v < 0.01 ? v.toFixed(4) : v.toFixed(3)
+}
+
 function ChargerRow({
   charger,
   currentDay,
@@ -70,9 +79,12 @@ function ChargerRow({
 }) {
   const hw = clamp01(charger.hardware_state)
   const isHealthy = charger.status !== 'failed' && hw >= 0.6
-  const pFail = getChargerPFail(charger, currentDay, config)
+  const ctx = getChargerLambdaContext(charger, currentDay, config)
+  const { lambdaD, pFail, lambdaBase, lambdaEntropy, lambdaAge, entropyH, stress } = ctx
+  const isFailed = charger.status === 'failed'
+  const lambdaStr = isFailed ? '—' : lambdaD < 0.0001 ? lambdaD.toExponential(2) : lambdaD.toFixed(4)
   const pFailPercent =
-    pFail >= 1 ? '100%' : pFail < 0.0001 ? (pFail * 100).toFixed(3) + '%' : (pFail * 100).toFixed(2) + '%'
+    pFail >= 1 ? (isFailed ? '100% (failed)' : '100%') : pFail < 0.0001 ? (pFail * 100).toFixed(3) + '%' : (pFail * 100).toFixed(2) + '%'
   return (
     <div
       style={{
@@ -95,12 +107,19 @@ function ChargerRow({
       />
       <div style={{ flex: 1, lineHeight: 1.35 }}>
         <div style={{ fontWeight: 500 }}>{charger.machine_id}</div>
-        <div style={{ opacity: 0.9 }}>
-          Use {charger.utilization_rate}% · Grid {charger.grid_stress}% · {charger.ambient_temperature} °C
+        <div style={{ opacity: 0.9, fontFamily: 'ui-monospace, monospace' }}>
+          P_fail = 1 − e^(−λ_d)  →  λ_d = {lambdaStr}  →  P_fail = {pFailPercent}
         </div>
-        <div style={{ opacity: 0.8 }}>
-          Plugs {charger.connector_cycles} · Maintenance {charger.maintenance_gap}d · Wear {(hw * 100).toFixed(0)}% · P_fail {pFailPercent}
-        </div>
+        {!isFailed && (
+          <>
+            <div style={{ opacity: 0.75, fontSize: 11, marginTop: 4, fontFamily: 'ui-monospace, monospace' }}>
+              λ_d = λ_base + λ_entropy + λ_age = {fmt(lambdaBase)} + {fmt(lambdaEntropy)} + {fmt(lambdaAge)}
+            </div>
+            <div style={{ opacity: 0.7, fontSize: 10, marginTop: 2, fontFamily: 'ui-monospace, monospace' }}>
+              H = {fmt(entropyH)} · stress: {STRESS_LABELS.map((l, i) => `${l}=${stress[i].toFixed(2)}`).join(' ')}
+            </div>
+          </>
+        )}
       </div>
     </div>
   )

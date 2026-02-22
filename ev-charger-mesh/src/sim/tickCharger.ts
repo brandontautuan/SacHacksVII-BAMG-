@@ -6,7 +6,7 @@
 import type { Charger } from '@/data/types'
 import type { FailureConfig } from './config'
 import { entropyFromConfig } from './stress'
-import { lambdaD, pFail } from './hazard'
+import { lambdaD, lambdaEntropy, lambdaAge, pFail } from './hazard'
 
 function clamp01(x: number): number {
   return Math.max(0, Math.min(1, x))
@@ -32,6 +32,83 @@ function chargerToStress(c: Charger): [number, number, number, number, number, n
   return [hw, util, grid, temp, cycles, gap, vDev, insul, gf, therm]
 }
 
+/** Stress component labels (same order as chargerToStress). */
+export const STRESS_LABELS = [
+  'hw',
+  'util',
+  'grid',
+  'temp',
+  'cycles',
+  'gap',
+  'vDev',
+  'insul',
+  'gf',
+  'therm',
+] as const
+
+export interface ChargerLambdaContext {
+  lambdaD: number
+  pFail: number
+  lambdaBase: number
+  lambdaEntropy: number
+  lambdaAge: number
+  entropyH: number
+  stress: readonly [number, number, number, number, number, number, number, number, number, number]
+}
+
+/**
+ * Returns lambda_d, P_fail, and full context (λ components, H, stress vector) for tooltip.
+ * If charger is failed, returns zeroed context with pFail: 1.
+ */
+export function getChargerLambdaContext(
+  charger: Charger,
+  day: number,
+  config: FailureConfig
+): ChargerLambdaContext {
+  if (charger.status === 'failed') {
+    return {
+      lambdaD: 0,
+      pFail: 1,
+      lambdaBase: config.lambda_base ?? 0,
+      lambdaEntropy: 0,
+      lambdaAge: 0,
+      entropyH: 0,
+      stress: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+    }
+  }
+  const installDay = charger.install_day ?? 0
+  const ageDays = Math.max(0, day - installDay)
+  const stress = chargerToStress(charger)
+  const h = entropyFromConfig(stress, config)
+  const hw01 = clamp01(charger.hardware_state)
+  const lBase = config.lambda_base ?? 0
+  const lEnt = lambdaEntropy(h, hw01, config)
+  const lAge = lambdaAge(ageDays, config)
+  const lD = lambdaD(h, hw01, ageDays, config)
+  return {
+    lambdaD: lD,
+    pFail: pFail(lD),
+    lambdaBase: lBase,
+    lambdaEntropy: lEnt,
+    lambdaAge: lAge,
+    entropyH: h,
+    stress,
+  }
+}
+
+/**
+ * Returns lambda_d and P_fail for this charger at the given day (for tooltip formula display).
+ * If charger is failed, returns { lambdaD: 0, pFail: 1 }.
+ */
+export function getChargerLambdaDAndPFail(
+  charger: Charger,
+  day: number,
+  config: FailureConfig
+): { lambdaD: number; pFail: number } {
+  const ctx = getChargerLambdaContext(charger, day, config)
+  return { lambdaD: ctx.lambdaD, pFail: ctx.pFail }
+}
+
 /**
  * Daily failure probability for this charger at the given day (same formula as tick).
  * Used by the tooltip to show P(fail today). Returns 1 if charger is already failed.
@@ -41,14 +118,7 @@ export function getChargerPFail(
   day: number,
   config: FailureConfig
 ): number {
-  if (charger.status === 'failed') return 1
-  const installDay = charger.install_day ?? 0
-  const ageDays = Math.max(0, day - installDay)
-  const stress = chargerToStress(charger)
-  const h = entropyFromConfig(stress, config)
-  const hw01 = clamp01(charger.hardware_state)
-  const lD = lambdaD(h, hw01, ageDays, config)
-  return pFail(lD)
+  return getChargerLambdaDAndPFail(charger, day, config).pFail
 }
 
 /** Daily hardware degradation (marginal decrease). Lower = agent has more time to respond. */

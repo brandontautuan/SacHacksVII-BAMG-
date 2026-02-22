@@ -1,14 +1,17 @@
 /**
  * Default failure model parameters (mirrors Python failure_engine/config.py).
- * lambda_entropy = alpha * H + beta * (1 - hardware_state)
- * lambda_age = gamma * (age / eta) ** k
- * lambda_d = lambda_base + lambda_entropy + lambda_age [capped by lambda_d_max]
- * P_fail = 1 - exp(-lambda_d)
  *
- * Stress vector has 10 dimensions:
- *   [hardware_state, utilization_rate, grid_stress, ambient_temperature,
- *    connector_cycles, maintenance_gap,
- *    voltage_deviation, insulation_health, ground_fault_risk, thermal_stress]
+ * Formulas:
+ *   lambda_entropy = alpha * H + beta * (1 - hardware_state)
+ *   lambda_age     = gamma * (age / eta) ** k
+ *   lambda_d       = lambda_base + lambda_entropy + lambda_age  [capped by lambda_d_max]
+ *   P_fail         = 1 - exp(-lambda_d)  (daily failure probability, clamped [0,1])
+ *
+ * Stress vector: 10 dimensions, each 0–1. Higher = more stress (except index 0).
+ *   [0] hardware_state: 1 = new, 0 = EOL (inverse stress; degradation also in lambda_entropy via (1-hw))
+ *   [1] utilization_rate, [2] grid_stress, [3] ambient_temperature,
+ *   [4] connector_cycles, [5] maintenance_gap,
+ *   [6] voltage_deviation, [7] 1 - insulation_health, [8] ground_fault_risk, [9] thermal_stress
  */
 
 /** 10 weights — 6 original + 4 electrical */

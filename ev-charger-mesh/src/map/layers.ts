@@ -28,10 +28,16 @@ function radiusForPower(power_kw: number): number {
   return MIN_RADIUS + clamped * (MAX_RADIUS - MIN_RADIUS)
 }
 
-export function buildScatterLayer(stations: Station[], filterType: string | null) {
-  const data = filterType
-    ? stations.filter((s) => s.charger_type === filterType)
-    : stations
+export function buildScatterLayer(
+  stations: Station[],
+  filterType: string | null,
+  selectedStationId: string | null = null
+) {
+  const data = selectedStationId
+    ? stations.filter((s) => s.id === selectedStationId)
+    : filterType
+      ? stations.filter((s) => s.charger_type === filterType)
+      : stations
 
   return new ScatterplotLayer<Station>({
     id: 'charger-nodes',

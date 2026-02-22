@@ -3,12 +3,15 @@
  * locations (filtered by type) with a side pop-out showing 5 chargers per location.
  */
 
-import { useState, useMemo } from 'react'
+import { useMemo } from 'react'
 import type { Charger, Station } from '@/data/types'
 
 export interface ControlsProps {
   /** All 25 Davis stations; list is filtered by filterType. */
   stations: Station[]
+  /** Currently selected location (pop-out open); when set, map shows only this station. */
+  selectedStationId: string | null
+  onSelectedStationChange: (stationId: string | null) => void
   meshVisible: boolean
   onMeshToggle: (v: boolean) => void
   filterType: string | null
@@ -32,6 +35,8 @@ const SPEED_OPTIONS = [
 
 export function Controls({
   stations,
+  selectedStationId,
+  onSelectedStationChange,
   meshVisible,
   onMeshToggle,
   filterType,
@@ -45,8 +50,6 @@ export function Controls({
   onSpeedChange,
   onResetSimulation,
 }: ControlsProps) {
-  const [expandedStationId, setExpandedStationId] = useState<string | null>(null)
-
   const filteredStations = useMemo(
     () =>
       filterType
@@ -55,8 +58,8 @@ export function Controls({
     [stations, filterType]
   )
 
-  const expandedStation = expandedStationId
-    ? stations.find((s) => s.id === expandedStationId)
+  const expandedStation = selectedStationId
+    ? stations.find((s) => s.id === selectedStationId)
     : null
 
   return (
@@ -215,8 +218,8 @@ export function Controls({
               key={station.id}
               type="button"
               onClick={() =>
-                setExpandedStationId((id) =>
-                  id === station.id ? null : station.id
+                onSelectedStationChange(
+                  selectedStationId === station.id ? null : station.id
                 )
               }
               style={{
@@ -228,7 +231,7 @@ export function Controls({
                 borderRadius: 6,
                 border: '1px solid rgba(255,255,255,0.1)',
                 background:
-                  expandedStationId === station.id
+                  selectedStationId === station.id
                     ? 'rgba(255,255,255,0.12)'
                     : 'rgba(40,40,48,0.6)',
                 color: '#e8e8e8',
@@ -270,7 +273,7 @@ export function Controls({
             {expandedStation.id}
             <button
               type="button"
-              onClick={() => setExpandedStationId(null)}
+              onClick={() => onSelectedStationChange(null)}
               style={{
                 padding: '2px 6px',
                 borderRadius: 4,

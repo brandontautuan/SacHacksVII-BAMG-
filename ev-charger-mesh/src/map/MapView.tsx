@@ -23,6 +23,8 @@ export interface MapViewProps {
   meshVisible: boolean
   filterType: string | null
   resetTrigger?: number
+  /** When set, only this station is shown on the map; all others hidden. */
+  selectedStationId?: string | null
   onHover: (station: Station | null, coords: { x: number; y: number }) => void
 }
 
@@ -32,6 +34,7 @@ export function MapView({
   meshVisible,
   filterType,
   resetTrigger = 0,
+  selectedStationId = null,
   onHover,
 }: MapViewProps) {
   const mapRef = useRef<MapRef>(null)
@@ -40,10 +43,10 @@ export function MapView({
   const [mapStyle, setMapStyle] = useState(MAP_STYLE_DARK)
 
   const layers = useMemo(() => {
-    const scatter = buildScatterLayer(stations, filterType)
+    const scatter = buildScatterLayer(stations, filterType, selectedStationId)
     const line = buildLineLayer(edges, meshVisible)
     return [scatter, line].filter(Boolean)
-  }, [stations, edges, meshVisible, filterType])
+  }, [stations, edges, meshVisible, filterType, selectedStationId])
 
   const handleHover = useCallback(
     (info: { object?: Station; x?: number; y?: number }) => {

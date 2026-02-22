@@ -24,6 +24,7 @@ export default function App() {
   const [filterType, setFilterType] = useState<string | null>(null)
   const [hoveredStation, setHoveredStation] = useState<Station | null>(null)
   const [pointer, setPointer] = useState({ x: 0, y: 0 })
+  const [selectedStationId, setSelectedStationId] = useState<string | null>(null)
 
   const edges = useMemo(() => buildGraph(stations), [])
 
@@ -48,10 +49,13 @@ export default function App() {
           meshVisible={meshVisible}
           filterType={filterType}
           resetTrigger={resetTrigger}
+          selectedStationId={selectedStationId}
           onHover={handleHover}
         />
         <Controls
           stations={stations}
+          selectedStationId={selectedStationId}
+          onSelectedStationChange={setSelectedStationId}
           meshVisible={meshVisible}
           onMeshToggle={setMeshVisible}
           filterType={filterType}

@@ -323,8 +323,8 @@ export function DavisPage() {
                     <XAxis
                       type="number"
                       dataKey="day"
-                      domain={[0, 50]}
-                      ticks={[0, 10, 20, 30, 40, 50]}
+                      domain={[0, 1000]}
+                      ticks={[0, 200, 400, 600, 800, 1000]}
                       tick={{ fontSize: 11, fill: '#a0a0a0' }}
                       stroke="rgba(255,255,255,0.2)"
                     />
@@ -334,7 +334,7 @@ export function DavisPage() {
                       domain={graphYDomain}
                       tick={{ fontSize: 11, fill: '#a0a0a0' }}
                       tickFormatter={(v) =>
-                        (typeof v === 'number' ? (v * 100).toFixed(3) + '%' : String(v))
+                        (typeof v === 'number' ? (v * 100).toFixed(2) + '%' : String(v))
                       }
                       stroke="rgba(255,255,255,0.2)"
                     />
@@ -345,7 +345,7 @@ export function DavisPage() {
                         fontSize: 12,
                       }}
                       formatter={(value: number) =>
-                        typeof value === 'number' ? (value * 100).toFixed(4) + '%' : String(value)
+                        typeof value === 'number' ? (value * 100).toFixed(2) + '%' : String(value)
                       }
                       labelFormatter={(label) => `Day ${label}`}
                     />

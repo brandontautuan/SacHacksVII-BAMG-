@@ -157,6 +157,24 @@ export function Controls({
         <span>Show mesh</span>
       </label>
 
+      <button
+        type="button"
+        onClick={onResetView}
+        style={{
+          padding: '8px 14px',
+          borderRadius: 6,
+          border: '1px solid rgba(255,255,255,0.15)',
+          background: 'rgba(60,60,72,0.95)',
+          color: '#e8e8e8',
+          cursor: 'pointer',
+          fontWeight: 500,
+        }}
+      >
+        Reset view
+      </button>
+
+      <div style={{ height: 1, background: 'rgba(255,255,255,0.1)', margin: '4px 0' }} />
+
       <div>
         <div style={{ marginBottom: 6, opacity: 0.9 }}>Filter by type</div>
         <select
@@ -180,24 +198,6 @@ export function Controls({
           ))}
         </select>
       </div>
-
-      <button
-        type="button"
-        onClick={onResetView}
-        style={{
-          padding: '8px 14px',
-          borderRadius: 6,
-          border: '1px solid rgba(255,255,255,0.15)',
-          background: 'rgba(60,60,72,0.95)',
-          color: '#e8e8e8',
-          cursor: 'pointer',
-          fontWeight: 500,
-        }}
-      >
-        Reset view
-      </button>
-
-      <div style={{ height: 1, background: 'rgba(255,255,255,0.1)', margin: '4px 0' }} />
 
       <div>
         <div style={{ marginBottom: 8, fontWeight: 600, opacity: 0.9 }}>

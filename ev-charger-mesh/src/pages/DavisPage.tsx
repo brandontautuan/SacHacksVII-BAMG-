@@ -174,7 +174,7 @@ export function DavisPage() {
   )
 }
 
-function AgentActivityFeed({ isRunning }: { isRunning: boolean }) {
+function AgentActivityFeed({ isRunning: _isRunning }: { isRunning: boolean }) {
   const [logs, setLogs] = useState<{ time: string; source: string; message: string }[]>([])
 
   useEffect(() => {

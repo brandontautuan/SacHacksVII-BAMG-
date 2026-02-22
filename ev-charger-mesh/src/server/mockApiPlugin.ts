@@ -1,4 +1,4 @@
-import type { Station, Charger } from '@/data/types'
+import type { Station, Charger } from '../data/types'
 export type { Station, Charger }
 
 import type { ViteDevServer } from 'vite'

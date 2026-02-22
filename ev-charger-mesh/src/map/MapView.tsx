@@ -99,6 +99,7 @@ export function MapView({
 
   return (
     <div
+      className="map-view-no-grab"
       style={{
         position: 'absolute',
         inset: 0,
@@ -117,6 +118,10 @@ export function MapView({
           [DAVIS_BOUNDS.minLng, DAVIS_BOUNDS.minLat],
           [DAVIS_BOUNDS.maxLng, DAVIS_BOUNDS.maxLat],
         ]}
+        dragPan={false}
+        dragRotate={false}
+        scrollZoom={true}
+        cursor="default"
       />
     </div>
   )

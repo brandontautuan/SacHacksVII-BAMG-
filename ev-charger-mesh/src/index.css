@@ -36,3 +36,20 @@ body {
 .locations-list-scroll::-webkit-scrollbar {
   display: none;
 }
+
+/* No grab cursor anywhere on the page */
+*,
+*::before,
+*::after {
+  cursor: default !important;
+}
+
+/* Restore pointer for clickable elements */
+button,
+a,
+[role="button"],
+input[type="checkbox"],
+select,
+label[for] {
+  cursor: pointer !important;
+}

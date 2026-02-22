@@ -5,7 +5,6 @@
 
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useNavigateWithTransition } from '@/AnimatedRoutes'
 import type { Charger, Station } from '@/data/types'
 
 export interface ControlsProps {
@@ -55,9 +54,8 @@ export function Controls({
   onSpeedChange,
   onResetSimulation,
 }: ControlsProps) {
-  const navigateWithTransition = useNavigateWithTransition()
   const navigate = useNavigate()
-  const goHome = () => (navigateWithTransition ? navigateWithTransition('/') : navigate('/'))
+  const goHome = () => navigate('/')
   const filteredStations = useMemo(() => {
     let list = filterType ? stations.filter((s) => s.charger_type === filterType) : stations
     if (filterFailedOnly) {

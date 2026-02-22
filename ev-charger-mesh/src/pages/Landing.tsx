@@ -1,10 +1,8 @@
 /**
  * Home page: EV Incident Response title, subtitle, and city buttons.
- * Selecting a city triggers slide transition (home leaves left, map slides in from right).
  */
 
 import { useNavigate } from 'react-router-dom'
-import { useNavigateWithTransition } from '@/AnimatedRoutes'
 
 const TITLE = 'EV Incident Response'
 const SUBTITLE = 'Select a city to view the dashboard'
@@ -15,10 +13,8 @@ const CITIES = [
 ] as const
 
 export function Landing() {
-  const navigateWithTransition = useNavigateWithTransition()
   const navigate = useNavigate()
-  const goTo = (to: string) =>
-    navigateWithTransition ? navigateWithTransition(to) : navigate(to)
+  const goTo = (to: string) => navigate(to)
 
   return (
     <div

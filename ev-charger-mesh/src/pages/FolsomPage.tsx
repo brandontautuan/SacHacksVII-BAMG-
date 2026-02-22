@@ -3,7 +3,6 @@
  */
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { ErrorBoundary } from '@/ErrorBoundary'
 import { MapView } from '@/map/MapView'
 import { Tooltip } from '@/ui/Tooltip'
@@ -11,11 +10,7 @@ import { Controls } from '@/ui/Controls'
 import { buildGraph } from '@/graph/buildGraph'
 import { stationFromInput } from '@/data/mockStation'
 import { tickCharger, defaultFailureConfig } from '@/sim'
-import {
-  FOLSOM_PAN_BOUNDS,
-  FOLSOM_REGION_BOUNDS,
-  FOLSOM_VIEW_STATE,
-} from '@/map/constants'
+import { FOLSOM_PAN_BOUNDS, FOLSOM_VIEW_STATE } from '@/map/constants'
 import type { Station, StationInput } from '@/data/types'
 
 import folsomChargersJson from '@/data/folsomChargers.json'
@@ -105,7 +100,6 @@ export function FolsomPage() {
           onHover={handleHover}
           viewState={FOLSOM_VIEW_STATE}
           maxBounds={folsomPanBounds}
-          regionBounds={FOLSOM_REGION_BOUNDS}
         />
         <Controls
           stations={stations}
@@ -127,26 +121,6 @@ export function FolsomPage() {
           onResetSimulation={resetSimulation}
         />
         <Tooltip station={hoveredStation} currentDay={currentDay} x={pointer.x} y={pointer.y} />
-        <Link
-          to="/"
-          style={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
-            zIndex: 10,
-            padding: '8px 14px',
-            borderRadius: 8,
-            border: '1px solid rgba(255,255,255,0.15)',
-            background: 'rgba(20, 20, 24, 0.92)',
-            color: '#e8e8e8',
-            textDecoration: 'none',
-            fontFamily: 'system-ui, sans-serif',
-            fontSize: 13,
-            fontWeight: 500,
-          }}
-        >
-          Home
-        </Link>
         <div
           style={{
             position: 'absolute',

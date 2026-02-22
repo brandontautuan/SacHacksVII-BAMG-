@@ -205,32 +205,11 @@ Think step-by-step and explain your reasoning.`;
             if (msgType === 'ai') {
                 const content = typeof msg.content === 'string' ? msg.content.trim() : '';
 
-                // AI reasoning text before tool calls → thinking event
-                if (content && msg.tool_calls?.length) {
-                    events.push({
-                        id: `think-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-                        timestamp: Date.now(),
-                        source: 'thinking',
-                        action: '💭 Agent Reasoning',
-                        detail: content.slice(0, 300),
-                        status: 'info',
-                    });
-                }
-
-                // Tool calls
+                // Only emit events for actionable tool calls (not scanning/inspecting)
                 if (msg.tool_calls?.length) {
                     for (const tc of msg.tool_calls) {
-                        const toolLabels: Record<string, { action: string; detail: string; status: AgentEvent['status'] }> = {
-                            get_bad_chargers: {
-                                action: '🔍 Scanning Grid',
-                                detail: 'Scanning all stations for failed, derated, or degraded chargers...',
-                                status: 'info',
-                            },
-                            inspect_charger: {
-                                action: `🔬 Inspecting ${tc.args?.machineId ?? 'charger'}`,
-                                detail: `Reading electrical telemetry from ${tc.args?.machineId} at ${tc.args?.stationId}`,
-                                status: 'info',
-                            },
+                        // Only show fix, derate, recalibrate, and ticket calls
+                        const actionLabels: Record<string, { action: string; detail: string; status: AgentEvent['status'] }> = {
                             recalibrate_charger: {
                                 action: `⚙️ Recalibrating ${tc.args?.machineId ?? 'charger'}`,
                                 detail: `Recalibrating electrical systems on ${tc.args?.machineId} at ${tc.args?.stationId}`,
@@ -253,23 +232,20 @@ Think step-by-step and explain your reasoning.`;
                             },
                         };
 
-                        const label = toolLabels[tc.name] ?? {
-                            action: `🛠️ ${tc.name}`,
-                            detail: JSON.stringify(tc.args).slice(0, 100),
-                            status: 'info' as const,
-                        };
-
-                        events.push({
-                            id: `${tc.id}-${Date.now()}`,
-                            timestamp: Date.now(),
-                            source: 'agent',
-                            ...label,
-                        });
+                        const label = actionLabels[tc.name];
+                        if (label) {
+                            events.push({
+                                id: `${tc.id}-${Date.now()}`,
+                                timestamp: Date.now(),
+                                source: 'agent',
+                                ...label,
+                            });
+                        }
                     }
                 }
             }
 
-            // Tool response messages
+            // Tool response messages — only show meaningful results
             if (msgType === 'tool') {
                 const content = typeof msg.content === 'string' ? msg.content : String(msg.content);
                 const isTicket = content.includes('Support ticket');
@@ -278,23 +254,25 @@ Think step-by-step and explain your reasoning.`;
                 const isDerate = content.includes('Derated');
                 const isFailed = content.includes('CANNOT');
 
-                let action = '📋 Result';
-                let status: AgentEvent['status'] = 'info';
+                // Only push events for actual results, not scan/inspect outputs
+                if (isTicket || isFix || isRecal || isDerate) {
+                    let action = '📋 Result';
+                    let status: AgentEvent['status'] = 'info';
 
-                if (isTicket) { action = '🎫 Ticket Created'; status = 'warning'; }
-                else if (isRecal) { action = '✅ Recalibration Done'; status = 'success'; }
-                else if (isDerate) { action = '⚡ Derate Applied'; status = 'warning'; }
-                else if (isFix) { action = '✅ Fix Applied'; status = 'success'; }
-                else if (isFailed) { action = '⚠️ Action Failed'; status = 'error'; }
+                    if (isTicket) { action = '🎫 Ticket Created'; status = 'warning'; }
+                    else if (isRecal) { action = '✅ Recalibration Done'; status = 'success'; }
+                    else if (isDerate) { action = '⚡ Derate Applied'; status = 'warning'; }
+                    else if (isFix) { action = '✅ Fix Applied'; status = 'success'; }
 
-                events.push({
-                    id: `tool-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-                    timestamp: Date.now(),
-                    source: 'tool',
-                    action,
-                    detail: content.slice(0, 250),
-                    status,
-                });
+                    events.push({
+                        id: `tool-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+                        timestamp: Date.now(),
+                        source: 'tool',
+                        action,
+                        detail: content.slice(0, 250),
+                        status,
+                    });
+                }
             }
         }
 

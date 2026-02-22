@@ -101,7 +101,6 @@ export function MapView({
         inset: 0,
         width: '100%',
         height: '100%',
-        minHeight: '100vh',
       }}
     >
       <Map
@@ -110,7 +109,7 @@ export function MapView({
         onLoad={onLoad}
         onError={onError}
         mapStyle={mapStyle}
-        style={{ width: '100%', height: '100%', minHeight: '100vh' }}
+        style={{ width: '100%', height: '100%' }}
         maxBounds={[
           [DAVIS_BOUNDS.minLng, DAVIS_BOUNDS.minLat],
           [DAVIS_BOUNDS.maxLng, DAVIS_BOUNDS.maxLat],

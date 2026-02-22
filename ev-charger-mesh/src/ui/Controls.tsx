@@ -1,8 +1,14 @@
 /**
- * UI controls: mesh visibility, filter by type, reset view, and simulation (play/pause, speed, day, reset).
+ * UI controls: simulation, mesh, filter, reset view; at bottom, list of Davis
+ * locations (filtered by type) with a side pop-out showing 5 chargers per location.
  */
 
+import { useState, useMemo } from 'react'
+import type { Charger, Station } from '@/data/types'
+
 export interface ControlsProps {
+  /** All 25 Davis stations; list is filtered by filterType. */
+  stations: Station[]
   meshVisible: boolean
   onMeshToggle: (v: boolean) => void
   filterType: string | null
@@ -25,6 +31,7 @@ const SPEED_OPTIONS = [
 ]
 
 export function Controls({
+  stations,
   meshVisible,
   onMeshToggle,
   filterType,
@@ -38,6 +45,20 @@ export function Controls({
   onSpeedChange,
   onResetSimulation,
 }: ControlsProps) {
+  const [expandedStationId, setExpandedStationId] = useState<string | null>(null)
+
+  const filteredStations = useMemo(
+    () =>
+      filterType
+        ? stations.filter((s) => s.charger_type === filterType)
+        : stations,
+    [stations, filterType]
+  )
+
+  const expandedStation = expandedStationId
+    ? stations.find((s) => s.id === expandedStationId)
+    : null
+
   return (
     <div
       style={{
@@ -46,19 +67,27 @@ export function Controls({
         left: 16,
         zIndex: 10,
         display: 'flex',
-        flexDirection: 'column',
-        gap: 10,
-        background: 'rgba(20, 20, 24, 0.92)',
-        padding: 14,
-        borderRadius: 10,
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+        alignItems: 'flex-start',
+        gap: 0,
         fontFamily: 'system-ui, sans-serif',
         fontSize: 13,
         color: '#e8e8e8',
       }}
     >
-      <div style={{ fontWeight: 600, opacity: 0.9, marginBottom: 2 }}>Simulation</div>
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 10,
+          background: 'rgba(20, 20, 24, 0.92)',
+          padding: 14,
+          borderRadius: 10,
+          border: '1px solid rgba(255,255,255,0.08)',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.3)',
+          minWidth: 220,
+        }}
+      >
+        <div style={{ fontWeight: 600, opacity: 0.9, marginBottom: 2 }}>Simulation</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <button
           type="button"
@@ -164,6 +193,140 @@ export function Controls({
       >
         Reset view
       </button>
+
+      <div style={{ height: 1, background: 'rgba(255,255,255,0.1)', margin: '4px 0' }} />
+
+      <div>
+        <div style={{ marginBottom: 8, fontWeight: 600, opacity: 0.9 }}>
+          Locations
+        </div>
+        <div
+          className="locations-list-scroll"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 4,
+            maxHeight: 280,
+            overflowY: 'auto',
+          }}
+        >
+          {filteredStations.map((station) => (
+            <button
+              key={station.id}
+              type="button"
+              onClick={() =>
+                setExpandedStationId((id) =>
+                  id === station.id ? null : station.id
+                )
+              }
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                width: '100%',
+                padding: '8px 10px',
+                borderRadius: 6,
+                border: '1px solid rgba(255,255,255,0.1)',
+                background:
+                  expandedStationId === station.id
+                    ? 'rgba(255,255,255,0.12)'
+                    : 'rgba(40,40,48,0.6)',
+                color: '#e8e8e8',
+                cursor: 'pointer',
+                fontSize: 12,
+                textAlign: 'left',
+              }}
+            >
+              <span style={{ fontWeight: 500 }}>{station.id}</span>
+              <span style={{ opacity: 0.8 }}>{station.charger_type}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+      </div>
+
+      {expandedStation && (
+        <div
+          style={{
+            marginLeft: 6,
+            padding: 8,
+            width: 200,
+            background: 'rgba(20, 20, 24, 0.96)',
+            borderRadius: 8,
+            border: '1px solid rgba(255,255,255,0.08)',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: 6,
+              fontWeight: 600,
+              fontSize: 12,
+            }}
+          >
+            {expandedStation.id}
+            <button
+              type="button"
+              onClick={() => setExpandedStationId(null)}
+              style={{
+                padding: '2px 6px',
+                borderRadius: 4,
+                border: '1px solid rgba(255,255,255,0.2)',
+                background: 'transparent',
+                color: '#e8e8e8',
+                cursor: 'pointer',
+                fontSize: 11,
+              }}
+            >
+              Close
+            </button>
+          </div>
+          <div style={{ fontSize: 11, opacity: 0.9, marginBottom: 6 }}>
+            {expandedStation.power_kw} kW · {expandedStation.charger_type}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {expandedStation.chargers.map((c) => (
+              <ChargerStatusBlock key={c.machine_id} charger={c} />
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ChargerStatusBlock({ charger }: { charger: Charger }) {
+  const isHealthy = charger.hardware_state === 1
+  return (
+    <div
+      style={{
+        padding: 6,
+        borderRadius: 4,
+        background: 'rgba(40,40,48,0.6)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        fontSize: 11,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+        <span
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: '50%',
+            background: isHealthy ? '#22c55e' : '#ef4444',
+          }}
+        />
+        <span style={{ fontWeight: 500 }}>{charger.machine_id}</span>
+        <span style={{ opacity: 0.8, fontSize: 10 }}>{isHealthy ? 'OK' : 'Near failure'}</span>
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 2, opacity: 0.95 }}>
+        <div>Utilization: {charger.utilization_rate}% · Grid: {charger.grid_stress}%</div>
+        <div>Temp: {charger.ambient_temperature}°C · Cycles: {charger.connector_cycles}</div>
+        <div>Maintenance: {charger.maintenance_gap}d</div>
+      </div>
     </div>
   )
 }

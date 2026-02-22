@@ -41,7 +41,7 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <div style={{ width: '100%', height: '100vh', minHeight: '100vh', position: 'relative' }}>
+      <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden' }}>
         <MapView
           stations={stations}
           edges={edges}
@@ -51,6 +51,7 @@ export default function App() {
           onHover={handleHover}
         />
         <Controls
+          stations={stations}
           meshVisible={meshVisible}
           onMeshToggle={setMeshVisible}
           filterType={filterType}

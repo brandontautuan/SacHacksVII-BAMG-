@@ -29,7 +29,7 @@ export function SacramentoPage() {
   const [stations, setStations] = useState<Station[]>(() => rawRows.map(stationFromInput))
   const [currentDay, setCurrentDay] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
-  const [speed, setSpeed] = useState(1)
+  const [speed, setSpeed] = useState(5)
   const config = defaultFailureConfig
 
   const edges = useMemo(() => buildGraph(stations), [stations])

@@ -11,6 +11,7 @@
     "validate-failure-model": "npx tsx src/sim/runDiagnostics.ts"
   },
   "dependencies": {
+    "recharts": "^2.15.0",
     "@deck.gl/core": "^9.0.0",
     "@deck.gl/layers": "^9.0.0",
     "@deck.gl/mapbox": "^9.0.0",

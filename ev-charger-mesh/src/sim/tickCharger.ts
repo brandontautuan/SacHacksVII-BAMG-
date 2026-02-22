@@ -51,8 +51,8 @@ export function getChargerPFail(
   return pFail(lD)
 }
 
-/** Daily hardware degradation (marginal decrease). */
-const HARDWARE_DEGRADATION_PER_DAY = 0.0002
+/** Daily hardware degradation (marginal decrease). Lower = agent has more time to respond. */
+const HARDWARE_DEGRADATION_PER_DAY = 0.00006
 
 export function tickCharger(charger: Charger, day: number, config: FailureConfig): Charger {
   if (charger.status === 'failed') return charger

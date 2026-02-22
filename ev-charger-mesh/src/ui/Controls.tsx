@@ -26,14 +26,10 @@ export interface ControlsProps {
   onPlayPause: () => void
   onSpeedChange: (speed: number) => void
   onResetSimulation: () => void
+  /** 'map' | 'graph' – when 'graph', show average P_fail vs days chart. */
+  viewMode?: 'map' | 'graph'
+  onViewModeChange?: (mode: 'map' | 'graph') => void
 }
-
-const SPEED_OPTIONS = [
-  { value: 0.5, label: '0.5x' },
-  { value: 1, label: '1x' },
-  { value: 2, label: '2x' },
-  { value: 5, label: '5x' },
-]
 
 export function Controls({
   stations,
@@ -53,6 +49,8 @@ export function Controls({
   onPlayPause,
   onSpeedChange,
   onResetSimulation,
+  viewMode = 'map',
+  onViewModeChange,
 }: ControlsProps) {
   const navigate = useNavigate()
   const goHome = () => navigate('/')
@@ -132,27 +130,42 @@ export function Controls({
         </button>
         <span style={{ opacity: 0.9 }}>Day {currentDay}</span>
       </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span style={{ opacity: 0.9 }}>Speed</span>
-        <select
-          value={speed}
-          onChange={(e) => onSpeedChange(Number(e.target.value))}
-          style={{
-            padding: '4px 8px',
-            borderRadius: 6,
-            border: '1px solid rgba(255,255,255,0.15)',
-            background: 'rgba(40,40,48,0.95)',
-            color: '#e8e8e8',
-            cursor: 'pointer',
-          }}
-        >
-          {SPEED_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      {onViewModeChange && (
+        <div style={{ display: 'flex', gap: 4 }}>
+          <button
+            type="button"
+            onClick={() => onViewModeChange('map')}
+            style={{
+              flex: 1,
+              padding: '6px 10px',
+              borderRadius: 6,
+              border: '1px solid rgba(255,255,255,0.2)',
+              background: viewMode === 'map' ? 'rgba(255,255,255,0.15)' : 'rgba(40,40,48,0.6)',
+              color: '#e8e8e8',
+              cursor: 'pointer',
+              fontSize: 12,
+            }}
+          >
+            Map
+          </button>
+          <button
+            type="button"
+            onClick={() => onViewModeChange('graph')}
+            style={{
+              flex: 1,
+              padding: '6px 10px',
+              borderRadius: 6,
+              border: '1px solid rgba(255,255,255,0.2)',
+              background: viewMode === 'graph' ? 'rgba(255,255,255,0.15)' : 'rgba(40,40,48,0.6)',
+              color: '#e8e8e8',
+              cursor: 'pointer',
+              fontSize: 12,
+            }}
+          >
+            Graph
+          </button>
+        </div>
+      )}
       <button
         type="button"
         onClick={onResetSimulation}

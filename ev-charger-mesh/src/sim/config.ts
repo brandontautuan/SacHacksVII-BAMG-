@@ -40,13 +40,13 @@ export interface FailureConfig {
 }
 
 export const defaultFailureConfig: FailureConfig = {
-  lambda_base: 0.0005,
-  alpha: 0.004,
-  beta: 0.002,
-  gamma: 0.008,
-  eta: 1095,
+  lambda_base: 0.0001,
+  alpha: 0.0015,
+  beta: 0.0008,
+  gamma: 0.002,
+  eta: 2000,
   k: 2,
   weights: DEFAULT_STRESS_WEIGHTS,
   epsilon: 0.01,
-  lambda_d_max: 0.05,
+  lambda_d_max: 0.02,
 }

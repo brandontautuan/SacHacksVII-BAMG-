@@ -26,6 +26,8 @@ export interface MapViewProps {
   /** When set, only this station is shown on the map; all others hidden. */
   selectedStationId?: string | null
   onHover: (station: Station | null, coords: { x: number; y: number }) => void
+  /** Called when the user clicks on the map (e.g. to close a pop-out). */
+  onMapClick?: () => void
 }
 
 export function MapView({
@@ -36,9 +38,13 @@ export function MapView({
   resetTrigger = 0,
   selectedStationId = null,
   onHover,
+  onMapClick,
 }: MapViewProps) {
   const mapRef = useRef<MapRef>(null)
   const mapInstanceRef = useRef<MapLibreMap | null>(null)
+  const onMapClickRef = useRef(onMapClick)
+  onMapClickRef.current = onMapClick
+  const mapClickHandlerRef = useRef<(() => void) | null>(null)
   const [overlay] = useState(() => new MapboxOverlay({ interleaved: true }))
   const [mapStyle, setMapStyle] = useState(MAP_STYLE_DARK)
 
@@ -79,12 +85,24 @@ export function MapView({
       } catch (err) {
         console.error('Deck overlay failed to attach:', err)
       }
+      const handleMapClick = () => onMapClickRef.current?.()
+      mapClickHandlerRef.current = handleMapClick
+      ev.target.on('click', handleMapClick)
     },
     [overlay]
   )
 
   useEffect(() => {
     return () => {
+      const map = mapInstanceRef.current
+      const handler = mapClickHandlerRef.current
+      if (map && handler) {
+        try {
+          map.off('click', handler)
+        } catch {
+          // ignore
+        }
+      }
       try {
         mapInstanceRef.current?.removeControl(overlay)
       } catch {
@@ -99,6 +117,7 @@ export function MapView({
 
   return (
     <div
+      className="map-view-no-grab"
       style={{
         position: 'absolute',
         inset: 0,
@@ -117,6 +136,10 @@ export function MapView({
           [DAVIS_BOUNDS.minLng, DAVIS_BOUNDS.minLat],
           [DAVIS_BOUNDS.maxLng, DAVIS_BOUNDS.maxLat],
         ]}
+        dragPan={false}
+        dragRotate={false}
+        scrollZoom={true}
+        cursor="default"
       />
     </div>
   )

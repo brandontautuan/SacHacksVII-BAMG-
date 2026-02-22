@@ -7,15 +7,16 @@ import { useMemo } from 'react'
 import type { Charger, Station } from '@/data/types'
 
 export interface ControlsProps {
-  /** All 25 Davis stations; list is filtered by filterType. */
+  /** All 25 Davis stations; list is filtered by filterType and filterFailedOnly. */
   stations: Station[]
-  /** Currently selected location (pop-out open); when set, map shows only this station. */
   selectedStationId: string | null
   onSelectedStationChange: (stationId: string | null) => void
   meshVisible: boolean
   onMeshToggle: (v: boolean) => void
   filterType: string | null
   onFilterChange: (t: string | null) => void
+  filterFailedOnly: boolean
+  onFilterFailedChange: (v: boolean) => void
   chargerTypes: string[]
   onResetView: () => void
   currentDay: number
@@ -41,6 +42,8 @@ export function Controls({
   onMeshToggle,
   filterType,
   onFilterChange,
+  filterFailedOnly,
+  onFilterFailedChange,
   chargerTypes,
   onResetView,
   currentDay,
@@ -50,13 +53,13 @@ export function Controls({
   onSpeedChange,
   onResetSimulation,
 }: ControlsProps) {
-  const filteredStations = useMemo(
-    () =>
-      filterType
-        ? stations.filter((s) => s.charger_type === filterType)
-        : stations,
-    [stations, filterType]
-  )
+  const filteredStations = useMemo(() => {
+    let list = filterType ? stations.filter((s) => s.charger_type === filterType) : stations
+    if (filterFailedOnly) {
+      list = list.filter((s) => s.chargers.some((c) => c.status === 'failed'))
+    }
+    return list
+  }, [stations, filterType, filterFailedOnly])
 
   const expandedStation = selectedStationId
     ? stations.find((s) => s.id === selectedStationId)
@@ -199,8 +202,17 @@ export function Controls({
         </select>
       </div>
 
+      <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', marginTop: 6 }}>
+        <input
+          type="checkbox"
+          checked={filterFailedOnly}
+          onChange={(e) => onFilterFailedChange(e.target.checked)}
+        />
+        <span style={{ opacity: 0.9 }}>Only stations with failed chargers</span>
+      </label>
+
       <div>
-        <div style={{ marginBottom: 8, fontWeight: 600, opacity: 0.9 }}>
+        <div style={{ marginBottom: 8, marginTop: 8, fontWeight: 600, opacity: 0.9 }}>
           Locations
         </div>
         <div
@@ -213,37 +225,67 @@ export function Controls({
             overflowY: 'auto',
           }}
         >
-          {filteredStations.map((station) => (
-            <button
-              key={station.id}
-              type="button"
-              onClick={() =>
-                onSelectedStationChange(
-                  selectedStationId === station.id ? null : station.id
-                )
-              }
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                width: '100%',
-                padding: '8px 10px',
-                borderRadius: 6,
-                border: '1px solid rgba(255,255,255,0.1)',
-                background:
-                  selectedStationId === station.id
-                    ? 'rgba(255,255,255,0.12)'
-                    : 'rgba(40,40,48,0.6)',
-                color: '#e8e8e8',
-                cursor: 'pointer',
-                fontSize: 12,
-                textAlign: 'left',
-              }}
-            >
-              <span style={{ fontWeight: 500 }}>{station.id}</span>
-              <span style={{ opacity: 0.8 }}>{station.charger_type}</span>
-            </button>
-          ))}
+          {filteredStations.map((station) => {
+            const failedCount = station.chargers.filter((c) => c.status === 'failed').length
+            const total = station.chargers.length
+            const failRatio = total > 0 ? failedCount / total : 0
+            // 0 failed = green; 1+ failed = light red → dark red by ratio
+            const isGreen = failedCount === 0
+            const redStrength = Math.min(1, failRatio * 1.2) // 0.2–1.0 so 1 failure is light
+            const borderLeft = isGreen
+              ? '3px solid #22c55e'
+              : `3px solid rgba(239,68,68,${0.5 + redStrength * 0.5})`
+            const border = isGreen
+              ? '1px solid rgba(34,197,94,0.4)'
+              : `1px solid rgba(239,68,68,${0.3 + redStrength * 0.5})`
+            const bgBase = isGreen
+              ? 'rgba(34,197,94,0.12)'
+              : `rgba(239,68,68,${0.1 + redStrength * 0.35})`
+            const bgSelected = isGreen
+              ? 'rgba(34,197,94,0.2)'
+              : `rgba(239,68,68,${0.15 + redStrength * 0.3})`
+            return (
+              <button
+                key={station.id}
+                type="button"
+                onClick={() =>
+                  onSelectedStationChange(
+                    selectedStationId === station.id ? null : station.id
+                  )
+                }
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  width: '100%',
+                  padding: '8px 10px',
+                  borderRadius: 6,
+                  border,
+                  borderLeft,
+                  background: selectedStationId === station.id ? bgSelected : bgBase,
+                  color: '#e8e8e8',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  textAlign: 'left',
+                }}
+              >
+                <span style={{ fontWeight: 500 }}>{station.id}</span>
+                <span style={{ opacity: 0.8 }}>
+                  {station.charger_type}
+                  {failedCount > 0 && (
+                    <span
+                      style={{
+                        color: isGreen ? undefined : `rgba(239,68,68,${0.8 + redStrength * 0.2})`,
+                        marginLeft: 4,
+                      }}
+                    >
+                      ({failedCount} failed)
+                    </span>
+                  )}
+                </span>
+              </button>
+            )
+          })}
         </div>
       </div>
       </div>
@@ -302,14 +344,15 @@ export function Controls({
 }
 
 function ChargerStatusBlock({ charger }: { charger: Charger }) {
-  const isHealthy = charger.hardware_state === 1
+  const isFailed = charger.status === 'failed'
+  const isHealthy = !isFailed && charger.hardware_state === 1
   return (
     <div
       style={{
         padding: 6,
         borderRadius: 4,
-        background: 'rgba(40,40,48,0.6)',
-        border: '1px solid rgba(255,255,255,0.08)',
+        background: isFailed ? 'rgba(239,68,68,0.2)' : 'rgba(40,40,48,0.6)',
+        border: isFailed ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.08)',
         fontSize: 11,
       }}
     >
@@ -319,11 +362,19 @@ function ChargerStatusBlock({ charger }: { charger: Charger }) {
             width: 6,
             height: 6,
             borderRadius: '50%',
-            background: isHealthy ? '#22c55e' : '#ef4444',
+            background: isFailed ? '#ef4444' : isHealthy ? '#22c55e' : '#f59e0b',
           }}
         />
         <span style={{ fontWeight: 500 }}>{charger.machine_id}</span>
-        <span style={{ opacity: 0.8, fontSize: 10 }}>{isHealthy ? 'OK' : 'Near failure'}</span>
+        <span
+          style={{
+            opacity: 0.9,
+            fontSize: 10,
+            color: isFailed ? '#ef4444' : undefined,
+          }}
+        >
+          {isFailed ? 'Failed' : isHealthy ? 'OK' : 'Near failure'}
+        </span>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 2, opacity: 0.95 }}>
         <div>Utilization: {charger.utilization_rate}% · Grid: {charger.grid_stress}%</div>

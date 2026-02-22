@@ -5,8 +5,8 @@
 /** One physical outlet/machine at a station. Simulation fields per charger. */
 export interface Charger {
   machine_id: string
-  /** 1 = new, 0 = near failure */
-  hardware_state: 0 | 1
+  /** 1 = new, 0 = end-of-life; degrades marginally each day */
+  hardware_state: number
   /** 0–100 */
   utilization_rate: number
   /** 0–100 */
@@ -16,6 +16,10 @@ export interface Charger {
   connector_cycles: number
   /** days until/since maintenance */
   maintenance_gap: number
+  /** Set by simulation tick; undefined = operational */
+  status?: 'operational' | 'failed'
+  /** Days since installation (for Weibull aging); default 0 */
+  install_day?: number
 }
 
 /** One map point: a station with location and exactly 3 chargers. */

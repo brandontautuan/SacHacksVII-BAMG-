@@ -18,12 +18,14 @@ export function generateMockChargers(stationId: string, count: number): Charger[
     const r = (j: number) => seeded(stationId, i * 10 + j)
     out.push({
       machine_id: `${stationId}-${i + 1}`,
-      hardware_state: r(1) > 0.25 ? 1 : 0,
+      hardware_state: 0.85 + r(1) * 0.15,
       utilization_rate: Math.round(r(2) * 100),
       grid_stress: Math.round(r(3) * 100),
       ambient_temperature: Math.round((r(4) * 30 + 15) * 10) / 10,
       connector_cycles: Math.floor(r(5) * 5000),
       maintenance_gap: Math.floor(r(6) * 90),
+      status: 'operational',
+      install_day: 0,
     })
   }
   return out

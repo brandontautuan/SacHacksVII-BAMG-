@@ -12,6 +12,7 @@ const TYPE_COLOR: Record<string, [number, number, number]> = {
   'Level 1': [120, 220, 120],
 }
 const DEFAULT_COLOR: [number, number, number] = [180, 180, 180]
+const FAILED_COLOR: [number, number, number] = [180, 50, 50]
 
 function colorForType(t: string): [number, number, number] {
   return TYPE_COLOR[t] ?? DEFAULT_COLOR
@@ -44,7 +45,8 @@ export function buildScatterLayer(
     data,
     getPosition: (d) => [d.longitude, d.latitude, 0],
     getRadius: (d) => radiusForPower(d.power_kw),
-    getFillColor: (d) => colorForType(d.charger_type),
+    getFillColor: (d) =>
+      d.chargers?.some((c) => c.status === 'failed') ? FAILED_COLOR : colorForType(d.charger_type),
     radiusMinPixels: 4,
     radiusMaxPixels: 40,
     pickable: true,

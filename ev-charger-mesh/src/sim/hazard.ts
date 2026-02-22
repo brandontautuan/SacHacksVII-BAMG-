@@ -26,7 +26,13 @@ export function lambdaD(
   ageDays: number,
   config: FailureConfig
 ): number {
-  return lambdaEntropy(entropyH, hardwareState, config) + lambdaAge(ageDays, config)
+  const base = config.lambda_base ?? 0
+  const raw =
+    base +
+    lambdaEntropy(entropyH, hardwareState, config) +
+    lambdaAge(ageDays, config)
+  if (config.lambda_d_max != null) return Math.min(raw, config.lambda_d_max)
+  return raw
 }
 
 /**

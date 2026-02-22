@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "validate-failure-model": "npx tsx src/sim/runDiagnostics.ts"
   },
   "dependencies": {
     "maplibre-gl": "^4.7.0",

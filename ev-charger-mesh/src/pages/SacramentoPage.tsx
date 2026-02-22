@@ -10,7 +10,11 @@ import { Controls } from '@/ui/Controls'
 import { buildGraph } from '@/graph/buildGraph'
 import { stationFromInput } from '@/data/mockStation'
 import { tickCharger, defaultFailureConfig } from '@/sim'
-import { SACRAMENTO_BOUNDS, SACRAMENTO_VIEW_STATE } from '@/map/constants'
+import {
+  SACRAMENTO_PAN_BOUNDS,
+  SACRAMENTO_REGION_BOUNDS,
+  SACRAMENTO_VIEW_STATE,
+} from '@/map/constants'
 import type { Station, StationInput } from '@/data/types'
 
 import sacramentoChargersJson from '@/data/sacramentoChargers.json'
@@ -82,9 +86,9 @@ export function SacramentoPage() {
     return () => clearInterval(id)
   }, [isRunning, speed, config])
 
-  const sacramentoBounds: [[number, number], [number, number]] = [
-    [SACRAMENTO_BOUNDS.minLng, SACRAMENTO_BOUNDS.minLat],
-    [SACRAMENTO_BOUNDS.maxLng, SACRAMENTO_BOUNDS.maxLat],
+  const sacramentoPanBounds: [[number, number], [number, number]] = [
+    [SACRAMENTO_PAN_BOUNDS.minLng, SACRAMENTO_PAN_BOUNDS.minLat],
+    [SACRAMENTO_PAN_BOUNDS.maxLng, SACRAMENTO_PAN_BOUNDS.maxLat],
   ]
 
   return (
@@ -99,7 +103,8 @@ export function SacramentoPage() {
           selectedStationId={selectedStationId}
           onHover={handleHover}
           viewState={SACRAMENTO_VIEW_STATE}
-          maxBounds={sacramentoBounds}
+          maxBounds={sacramentoPanBounds}
+          regionBounds={SACRAMENTO_REGION_BOUNDS}
         />
         <Controls
           stations={stations}

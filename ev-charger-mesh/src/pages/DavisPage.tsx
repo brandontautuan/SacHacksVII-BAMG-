@@ -10,6 +10,7 @@ import { Controls } from '@/ui/Controls'
 import { buildGraph } from '@/graph/buildGraph'
 import { stationFromInput } from '@/data/mockStation'
 import { tickCharger, defaultFailureConfig } from '@/sim'
+import { DAVIS_REGION_BOUNDS } from '@/map/constants'
 import type { Station, StationInput } from '@/data/types'
 
 import chargersJson from '@/data/chargers.json'
@@ -92,6 +93,7 @@ export function DavisPage() {
           resetTrigger={resetTrigger}
           selectedStationId={selectedStationId}
           onHover={handleHover}
+          regionBounds={DAVIS_REGION_BOUNDS}
         />
         <Controls
           stations={stations}

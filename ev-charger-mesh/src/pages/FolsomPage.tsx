@@ -10,7 +10,11 @@ import { Controls } from '@/ui/Controls'
 import { buildGraph } from '@/graph/buildGraph'
 import { stationFromInput } from '@/data/mockStation'
 import { tickCharger, defaultFailureConfig } from '@/sim'
-import { FOLSOM_BOUNDS, FOLSOM_VIEW_STATE } from '@/map/constants'
+import {
+  FOLSOM_PAN_BOUNDS,
+  FOLSOM_REGION_BOUNDS,
+  FOLSOM_VIEW_STATE,
+} from '@/map/constants'
 import type { Station, StationInput } from '@/data/types'
 
 import folsomChargersJson from '@/data/folsomChargers.json'
@@ -82,9 +86,9 @@ export function FolsomPage() {
     return () => clearInterval(id)
   }, [isRunning, speed, config])
 
-  const folsomBounds: [[number, number], [number, number]] = [
-    [FOLSOM_BOUNDS.minLng, FOLSOM_BOUNDS.minLat],
-    [FOLSOM_BOUNDS.maxLng, FOLSOM_BOUNDS.maxLat],
+  const folsomPanBounds: [[number, number], [number, number]] = [
+    [FOLSOM_PAN_BOUNDS.minLng, FOLSOM_PAN_BOUNDS.minLat],
+    [FOLSOM_PAN_BOUNDS.maxLng, FOLSOM_PAN_BOUNDS.maxLat],
   ]
 
   return (
@@ -99,7 +103,8 @@ export function FolsomPage() {
           selectedStationId={selectedStationId}
           onHover={handleHover}
           viewState={FOLSOM_VIEW_STATE}
-          maxBounds={folsomBounds}
+          maxBounds={folsomPanBounds}
+          regionBounds={FOLSOM_REGION_BOUNDS}
         />
         <Controls
           stations={stations}

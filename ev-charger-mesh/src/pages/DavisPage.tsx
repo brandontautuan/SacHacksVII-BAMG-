@@ -13,6 +13,8 @@ import { stationFromInput } from '@/data/mockStation'
 import { tickCharger, defaultFailureConfig } from '@/sim'
 import { DAVIS_REGION_BOUNDS } from '@/map/constants'
 import type { Station, StationInput } from '@/data/types'
+import { setStations as syncStations } from '@/server/mockApiPlugin'
+import { startAgent, stopAgent } from '@/agent/agentService'
 
 import chargersJson from '@/data/chargers.json'
 
@@ -66,17 +68,39 @@ export function DavisPage() {
   }, [])
 
   useEffect(() => {
+    console.log('[DavisPage] Syncing stations, count:', stations.length)
+    syncStations(stations)
+  }, [stations])
+
+  useEffect(() => {
+    console.log('[DavisPage] isRunning changed:', isRunning)
+    if (isRunning) {
+      console.log('[DavisPage] Starting agent...')
+      startAgent(5000, () => currentDay)
+    } else {
+      console.log('[DavisPage] Stopping agent...')
+      stopAgent()
+    }
+    return () => {
+      console.log('[DavisPage] Cleanup - stopping agent')
+      stopAgent()
+    }
+  }, [isRunning])
+
+  useEffect(() => {
     if (!isRunning) return
     const intervalMs = 1000 / speed
     const id = setInterval(() => {
       setCurrentDay((d) => {
         const next = d + 1
-        setStations((prev) =>
-          prev.map((s) => ({
+        setStations((prev) => {
+          const updated = prev.map((s) => ({
             ...s,
             chargers: s.chargers.map((c) => tickCharger(c, next, config)),
           }))
-        )
+          syncStations(updated)
+          return updated
+        })
         return next
       })
     }, intervalMs)
@@ -138,6 +162,20 @@ export function DavisPage() {
         </Link>
         <div
           style={{
+            position: 'fixed',
+            top: 52,
+            right: 16,
+            zIndex: 9999,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+            maxWidth: 320,
+          }}
+        >
+          <AgentActivityFeed isRunning={isRunning} />
+        </div>
+        <div
+          style={{
             position: 'absolute',
             bottom: 16,
             right: 16,
@@ -156,5 +194,96 @@ export function DavisPage() {
         </div>
       </div>
     </ErrorBoundary>
+  )
+}
+
+function AgentActivityFeed({ isRunning }: { isRunning: boolean }) {
+  const [logs, setLogs] = useState<{ time: string; source: string; message: string }[]>([])
+
+  useEffect(() => {
+    const fetchLogs = () => {
+      fetch('/api/agent-logs')
+        .then(r => r.json())
+        .then(data => {
+          if (Array.isArray(data)) setLogs(data)
+        })
+        .catch(() => {})
+    }
+
+    fetchLogs()
+    const id = setInterval(fetchLogs, 2000)
+    return () => clearInterval(id)
+  }, [])
+
+  const recentLogs = logs.slice(-3).reverse()
+  const isCriticalOrFailed = (msg: string) => /CRITICAL|FAILED/i.test(msg)
+
+  return (
+    <>
+      <div
+        style={{
+          fontFamily: 'system-ui, -apple-system, sans-serif',
+          fontWeight: 700,
+          fontSize: 12,
+          letterSpacing: '0.08em',
+          color: '#ffffff',
+          marginBottom: 6,
+        }}
+      >
+        AGENT LOGS
+      </div>
+      {recentLogs.map((log, i) => (
+        <div
+          key={`${log.time}-${i}-${log.message.slice(0, 20)}`}
+          className="agent-log-entry"
+          style={{
+            padding: '10px 12px',
+            borderRadius: 8,
+            background: 'rgba(30, 30, 34, 0.4)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            display: 'flex',
+            gap: 8,
+            alignItems: 'flex-start',
+          }}
+        >
+          {isCriticalOrFailed(log.message) && (
+            <span
+              style={{
+                flexShrink: 0,
+                color: '#facc15',
+                fontSize: 16,
+                lineHeight: 1,
+              }}
+              aria-hidden
+            >
+              ⚠
+            </span>
+          )}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div
+              style={{
+                fontSize: 10,
+                color: 'rgba(255, 255, 255, 0.55)',
+                marginBottom: 4,
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+              }}
+            >
+              {log.time} · AGENT
+            </div>
+            <div
+              style={{
+                fontWeight: 700,
+                fontSize: 13,
+                color: '#ffffff',
+                lineHeight: 1.4,
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+              }}
+            >
+              {log.message}
+            </div>
+          </div>
+        </div>
+      ))}
+    </>
   )
 }

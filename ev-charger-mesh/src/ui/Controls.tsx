@@ -4,6 +4,8 @@
  */
 
 import { useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useNavigateWithTransition } from '@/AnimatedRoutes'
 import type { Charger, Station } from '@/data/types'
 
 export interface ControlsProps {
@@ -53,6 +55,9 @@ export function Controls({
   onSpeedChange,
   onResetSimulation,
 }: ControlsProps) {
+  const navigateWithTransition = useNavigateWithTransition()
+  const navigate = useNavigate()
+  const goHome = () => (navigateWithTransition ? navigateWithTransition('/') : navigate('/'))
   const filteredStations = useMemo(() => {
     let list = filterType ? stations.filter((s) => s.charger_type === filterType) : stations
     if (filterFailedOnly) {
@@ -93,6 +98,23 @@ export function Controls({
           minWidth: 220,
         }}
       >
+        <button
+          type="button"
+          onClick={goHome}
+          style={{
+            display: 'inline-block',
+            marginBottom: 8,
+            fontSize: 12,
+            color: 'rgba(255,255,255,0.8)',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            fontFamily: 'inherit',
+          }}
+        >
+          ← Back to home
+        </button>
         <div style={{ fontWeight: 600, opacity: 0.9, marginBottom: 2 }}>Simulation</div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <button

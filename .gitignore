@@ -18,3 +18,5 @@ __pycache__/
 .venv/
 venv/
 ev-charger-mesh/node_modules/
+.playwright-mcp/
+.agents/

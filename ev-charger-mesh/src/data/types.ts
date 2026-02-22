@@ -40,6 +40,10 @@ export interface Charger {
   is_derated?: boolean
   /** Days since installation (for Weibull aging); default 0 */
   install_day?: number
+  /** Agent-calculated risk level */
+  risk_level?: string
+  /** Agent-predicted days until failure */
+  days_until_failure?: number
 }
 
 /** Extended node used by the per-node failure simulation (node.ts). */

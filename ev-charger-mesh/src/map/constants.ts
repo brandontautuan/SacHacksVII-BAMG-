@@ -53,7 +53,7 @@ export const INITIAL_VIEW_STATE = {
 export const SACRAMENTO_VIEW_STATE = {
   longitude: SACRAMENTO_CENTER[0],
   latitude: SACRAMENTO_CENTER[1],
-  zoom: 14,
+  zoom: 15,
   pitch: 0,
   bearing: 0,
 } as const

@@ -12,13 +12,6 @@ function seeded(seed: string, index: number): number {
   return Math.abs((h + index) % 1000) / 1000
 }
 
-/** Returns nominal voltage based on charger type string. */
-function nominalVoltage(chargerType: string): number {
-  const t = chargerType.toLowerCase()
-  if (t.includes('dc') || t.includes('fast')) return 400 + Math.random() * 80 // 400–480
-  if (t.includes('level 1') || t.includes('l1')) return 120
-  return 208 + Math.random() * 32 // 208–240 for Level 2
-}
 
 export function generateMockChargers(stationId: string, count: number, chargerType: string = 'Level 2'): Charger[] {
   const out: Charger[] = []

@@ -1,5 +1,5 @@
 /**
- * Root app: loads charger JSON, transforms to stations (5 chargers each),
+ * Root app: loads charger JSON, transforms to stations (3 chargers each),
  * builds mesh graph, holds view/tooltip state, renders map and controls.
  */
 
@@ -15,7 +15,7 @@ import type { Station, StationInput } from '@/data/types'
 import chargersJson from '@/data/chargers.json'
 
 const rawRows = chargersJson as StationInput[]
-/** One JSON row → one station with exactly 5 mock chargers (computed once at load). */
+/** One JSON row → one station with exactly 3 mock chargers (computed once at load). */
 const stations: Station[] = rawRows.map(stationFromInput)
 
 export default function App() {

@@ -18,7 +18,7 @@ export interface Charger {
   maintenance_gap: number
 }
 
-/** One map point: a station with location and exactly 5 chargers. */
+/** One map point: a station with location and exactly 3 chargers. */
 export interface Station {
   id: string
   latitude: number
@@ -28,7 +28,7 @@ export interface Station {
   chargers: Charger[]
 }
 
-/** Raw row from chargers.json (before generating 5 chargers per station). */
+/** Raw row from chargers.json (before generating 3 chargers per station). */
 export interface StationInput {
   id: string
   latitude: number

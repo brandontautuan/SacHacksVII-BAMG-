@@ -1,6 +1,6 @@
 /**
  * Deck.gl layer factories: scatter plot for stations (one point per station),
- * line layer for mesh edges. Picked object is the full Station (with 5 chargers).
+ * line layer for mesh edges. Picked object is the full Station (with 3 chargers).
  */
 
 import { ScatterplotLayer, LineLayer } from '@deck.gl/layers'

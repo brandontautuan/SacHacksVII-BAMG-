@@ -1,5 +1,5 @@
 /**
- * Tooltip when hovering a station: shows station id and a breakdown of all 5
+ * Tooltip when hovering a station: shows station id and a breakdown of all 3
  * chargers (status icon, machine_id, utilization %, grid_stress, maintenance).
  * Dark theme, position: fixed, inline styles only.
  */

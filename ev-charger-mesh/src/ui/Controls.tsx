@@ -1,6 +1,6 @@
 /**
  * UI controls: simulation, mesh, filter, reset view; at bottom, list of Davis
- * locations (filtered by type) with a side pop-out showing 5 chargers per location.
+ * locations (filtered by type) with a side pop-out showing 3 chargers per location.
  */
 
 import { useMemo } from 'react'

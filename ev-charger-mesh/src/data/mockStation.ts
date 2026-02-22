@@ -1,5 +1,5 @@
 /**
- * Generates a station from a JSON row by adding exactly 5 mock chargers
+ * Generates a station from a JSON row by adding exactly 3 mock chargers
  * with random simulation fields (hardware_state, utilization_rate, etc.).
  */
 
@@ -36,6 +36,6 @@ export function stationFromInput(row: StationInput): Station {
     longitude: row.longitude,
     power_kw: row.power_kw,
     charger_type: row.charger_type,
-    chargers: generateMockChargers(row.id, 5),
+    chargers: generateMockChargers(row.id, 3),
   }
 }

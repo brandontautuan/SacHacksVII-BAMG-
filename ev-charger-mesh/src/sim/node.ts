@@ -12,6 +12,10 @@ function age(node: ChargerNode, day: number): number {
   return Math.max(0, day - node.install_day)
 }
 
+function clamp01(x: number): number {
+  return Math.max(0, Math.min(1, x))
+}
+
 /**
  * One day step. Returns a new node object with updated state (or same if failed and no repair).
  * Uses Math.random() for failure trial. Stores last_p_fail and last_lambda_d on the node for tooltip.
@@ -21,13 +25,25 @@ export function tickNode(node: ChargerNode, day: number, config: FailureConfig):
     return node
   }
 
+  const isDcfc = node.voltage_v > 300
+  const nomV = isDcfc ? 440 : 224
+  const devV = isDcfc ? 60 : 30
+  const vDev = clamp01(Math.abs(node.voltage_v - nomV) / devV)
+  const insul = 1 - clamp01(node.insulation_resistance_mohm / 500)
+  const gf = clamp01(node.ground_fault_current_ma / 30)
+  const therm = clamp01((node.internal_temp_celsius - 25) / 60)
+
   const stress = stressVector(
     node.hardware_state,
     node.utilization_rate,
     node.grid_stress,
     node.ambient_temperature,
     node.connector_cycles,
-    node.maintenance_gap
+    node.maintenance_gap,
+    vDev,
+    insul,
+    gf,
+    therm
   )
   const h = entropyFromConfig(stress, config)
   const ageDays = age(node, day)

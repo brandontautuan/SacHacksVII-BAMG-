@@ -16,10 +16,39 @@ export interface Charger {
   connector_cycles: number
   /** days until/since maintenance */
   maintenance_gap: number
-  /** Set by simulation tick; undefined = operational */
-  status?: 'operational' | 'failed'
+
+  // ── Electrical telemetry ────────────────────────────────────
+  /** AC supply voltage in volts (nominal 208–240 V for L2, 400–480 V for DCFC) */
+  voltage_v: number
+  /** Output current in amps (0 when idle, up to max_rate when charging) */
+  current_a: number
+  /** Power factor 0–1 (unity = 1.0; degraded inverter → drops toward 0.7) */
+  power_factor: number
+  /** Insulation resistance in megaohms (healthy ≥ 500; critical < 100) */
+  insulation_resistance_mohm: number
+  /** Ground-fault leakage current in milliamps (healthy < 5; trip at 30) */
+  ground_fault_current_ma: number
+  /** Total harmonic distortion % (healthy < 5%; degraded > 8%) */
+  thd_percent: number
+  /** Internal component temperature °C (power electronics / rectifier) */
+  internal_temp_celsius: number
+
+  // ── Status & control ───────────────────────────────────────
+  /** Set by simulation tick */
+  status?: 'operational' | 'failed' | 'derated'
+  /** True when agent has sent DERATE_POWER command */
+  is_derated?: boolean
   /** Days since installation (for Weibull aging); default 0 */
   install_day?: number
+}
+
+/** Extended node used by the per-node failure simulation (node.ts). */
+export interface ChargerNode extends Charger {
+  status: 'operational' | 'failed' | 'derated'
+  install_day: number
+  last_p_fail?: number
+  last_lambda_d?: number
+  failed_at_day?: number
 }
 
 /** One map point: a station with location and exactly 3 chargers. */

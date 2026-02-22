@@ -13,14 +13,23 @@ function clamp01(x: number): number {
 }
 
 /** Normalize Charger fields to 0–1 for stress/hazard (same order as stressVector). */
-function chargerToStress(c: Charger): [number, number, number, number, number, number] {
+function chargerToStress(c: Charger): [number, number, number, number, number, number, number, number, number, number] {
   const hw = clamp01(c.hardware_state)
   const util = clamp01(c.utilization_rate / 100)
   const grid = clamp01(c.grid_stress / 100)
   const temp = clamp01((c.ambient_temperature - 15) / 30)
   const cycles = clamp01(c.connector_cycles / 5000)
   const gap = clamp01(c.maintenance_gap / 90)
-  return [hw, util, grid, temp, cycles, gap]
+
+  const isDcfc = c.voltage_v > 300
+  const nomV = isDcfc ? 440 : 224
+  const devV = isDcfc ? 60 : 30
+  const vDev = clamp01(Math.abs(c.voltage_v - nomV) / devV)
+  const insul = 1 - clamp01(c.insulation_resistance_mohm / 500)
+  const gf = clamp01(c.ground_fault_current_ma / 30)
+  const therm = clamp01((c.internal_temp_celsius - 25) / 60)
+
+  return [hw, util, grid, temp, cycles, gap, vDev, insul, gf, therm]
 }
 
 /**

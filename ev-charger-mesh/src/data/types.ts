@@ -35,7 +35,7 @@ export interface Charger {
 
   // ── Status & control ───────────────────────────────────────
   /** Set by simulation tick */
-  status?: 'operational' | 'failed' | 'derated'
+  status?: 'operational' | 'failed' | 'derated' | 'partially_operational'
   /** True when agent has sent DERATE_POWER command */
   is_derated?: boolean
   /** Days since installation (for Weibull aging); default 0 */
@@ -48,7 +48,7 @@ export interface Charger {
 
 /** Extended node used by the per-node failure simulation (node.ts). */
 export interface ChargerNode extends Charger {
-  status: 'operational' | 'failed' | 'derated'
+  status: 'operational' | 'failed' | 'derated' | 'partially_operational'
   install_day: number
   last_p_fail?: number
   last_lambda_d?: number

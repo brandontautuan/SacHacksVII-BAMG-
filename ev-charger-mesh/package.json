@@ -11,17 +11,22 @@
     "validate-failure-model": "npx tsx src/sim/runDiagnostics.ts"
   },
   "dependencies": {
-    "recharts": "^2.15.0",
     "@deck.gl/core": "^9.0.0",
     "@deck.gl/layers": "^9.0.0",
     "@deck.gl/mapbox": "^9.0.0",
     "@deck.gl/react": "^9.0.0",
+    "@langchain/core": "^1.1.27",
+    "@langchain/groq": "^1.1.2",
+    "@langchain/langgraph": "^1.1.5",
     "deck.gl": "^9.0.0",
+    "langchain": "^1.2.25",
     "maplibre-gl": "^4.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-map-gl": "^7.1.7",
-    "react-router-dom": "^7.13.0"
+    "react-router-dom": "^7.13.0",
+    "recharts": "^2.15.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",
@@ -34,6 +39,7 @@
     "globals": "^15.11.0",
     "typescript": "~5.6.2",
     "typescript-eslint": "^8.11.0",
-    "vite": "^5.4.10"
+    "vite": "^5.4.10",
+    "vite-plugin-node-polyfills": "^0.25.0"
   }
 }

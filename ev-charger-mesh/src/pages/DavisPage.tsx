@@ -9,26 +9,17 @@ import { Tooltip } from '@/ui/Tooltip'
 import { Controls } from '@/ui/Controls'
 import { buildGraph } from '@/graph/buildGraph'
 import { stationFromInput } from '@/data/mockStation'
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-  Legend,
-} from 'recharts'
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts'
 import { tickCharger, getChargerPFail, defaultFailureConfig } from '@/sim'
 import type { Station, StationInput } from '@/data/types'
 import { setStations as syncStations } from '@/server/mockApiPlugin'
 import { startAgent, stopAgent } from '@/agent/agentService'
+import { bindStations, getDaysSaved, resetDaysSaved, type AgentEvent } from '@/sim/governor'
+import { runGridAgent } from '@/agent/gridSummaryAgent'
 
 import chargersJson from '@/data/chargers.json'
 
 const rawRows = chargersJson as StationInput[]
-/** On average, a down charger loses this much per year; we use it to value saved downtime. */
-const DOLLARS_LOST_PER_CHARGER_ANNUALLY = 5000
 
 export function DavisPage() {
   const [resetTrigger, setResetTrigger] = useState(0)
@@ -39,6 +30,9 @@ export function DavisPage() {
   const [pointer, setPointer] = useState({ x: 0, y: 0 })
   const [selectedStationId, setSelectedStationId] = useState<string | null>(null)
 
+  const [agentEvents, setAgentEvents] = useState<AgentEvent[]>([])
+  const [gridSummary, setGridSummary] = useState<string>('Initializing Grid Governor...')
+
   const [stations, setStations] = useState<Station[]>(() => rawRows.map(stationFromInput))
   const [currentDay, setCurrentDay] = useState(0)
   const [isRunning, setIsRunning] = useState(false)
@@ -47,7 +41,6 @@ export function DavisPage() {
   const [pfailHistory, setPfailHistory] = useState<
     Array<{ day: number; avgPfail: number; avgPfailNoAgent: number }>
   >([])
-  const [cumulativeChargerDaysDownWithAgent, setCumulativeChargerDaysDownWithAgent] = useState(0)
   const [cumulativeChargerDaysDownNoAgent, setCumulativeChargerDaysDownNoAgent] = useState(0)
   const lastAppendedDayRef = useRef(-1)
   const noAgentStationsRef = useRef<Station[]>([])
@@ -83,11 +76,8 @@ export function DavisPage() {
     return [0, max <= 0 ? 0.001 : max * 1.05] as [number, number]
   }, [pfailHistory])
 
-  const chargerDaysDowntimeSaved =
-    cumulativeChargerDaysDownNoAgent - cumulativeChargerDaysDownWithAgent
-  const moneySaved =
-    Math.max(0, chargerDaysDowntimeSaved) *
-    (DOLLARS_LOST_PER_CHARGER_ANNUALLY / 365)
+  const chargerDaysDowntimeSaved = getDaysSaved()
+  const moneySaved = chargerDaysDowntimeSaved * 150  // $150/day per charger
   const moneySavedFormatted = new Intl.NumberFormat('en-US', {
     style: 'currency',
     currency: 'USD',
@@ -102,8 +92,8 @@ export function DavisPage() {
     setCurrentDay(0)
     setIsRunning(false)
     setPfailHistory([])
-    setCumulativeChargerDaysDownWithAgent(0)
     setCumulativeChargerDaysDownNoAgent(0)
+    resetDaysSaved()
     lastAppendedDayRef.current = -1
     noAgentStationsRef.current = cloneStationsForNoAgent()
   }, [])
@@ -122,6 +112,8 @@ export function DavisPage() {
   useEffect(() => {
     console.log('[DavisPage] Syncing stations, count:', stations.length)
     syncStations(stations)
+    // Keep the shared governor reference in sync
+    bindStations(stations, setStations)
   }, [stations])
 
   useEffect(() => {
@@ -139,8 +131,14 @@ export function DavisPage() {
     }
   }, [isRunning])
 
+  // Refs for setInterval
+  const currentDayRef = useRef(currentDay)
+  currentDayRef.current = currentDay
+  const stationsRef = useRef(stations)
+  stationsRef.current = stations
+
   useEffect(() => {
-    if (currentDay <= 1000 && currentDay > lastAppendedDayRef.current) {
+    if (currentDay <= 50 && currentDay > lastAppendedDayRef.current) {
       lastAppendedDayRef.current = currentDay
       let sum = 0
       let count = 0
@@ -163,46 +161,77 @@ export function DavisPage() {
       if (avgPfailNoAgent < avgPfail) {
         avgPfailNoAgent = avgPfail
       }
-      const countWith = stations.reduce(
-        (n, s) => n + s.chargers.filter((c) => c.status === 'failed').length,
-        0
-      )
       const countNoAgentFailed = noAgentStationsRef.current.reduce(
         (n, s) => n + s.chargers.filter((c) => c.status === 'failed').length,
         0
       )
-      setCumulativeChargerDaysDownWithAgent((prev) => prev + countWith)
       setCumulativeChargerDaysDownNoAgent((prev) => prev + countNoAgentFailed)
       setPfailHistory((h) => {
         const next = [...h, { day: currentDay, avgPfail, avgPfailNoAgent }]
-        return next.length <= 1001 ? next : next.slice(-1001)
+        return next.length <= 51 ? next : next.slice(-51)
       })
     }
   }, [currentDay, stations, config])
 
+  // Adaptive tick: fast-forward when healthy, slow down + LLM agent when a charger fails
+  const tickIntervalRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const llmInFlightRef = useRef(false)
+
   useEffect(() => {
     if (!isRunning) return
-    const intervalMs = 1000 / speed
-    const id = setInterval(() => {
-      setCurrentDay((d) => {
-        const next = d + 1
-        noAgentStationsRef.current = noAgentStationsRef.current.map((s) => ({
-          ...s,
-          chargers: s.chargers.map((c) => tickCharger(c, next, config)),
-        }))
-        setStations((prev) => {
-          const updated = prev.map((s) => ({
-            ...s,
-            chargers: s.chargers.map((c) => tickCharger(c, next, config)),
-          }))
-          syncStations(updated)
-          return updated
+
+    const FAST_MS = 200   // speed through uneventful days
+    const SLOW_MS = 7000  // slow down when there's action
+
+    const doTick = () => {
+      const nextDay = currentDayRef.current + 1
+
+      noAgentStationsRef.current = noAgentStationsRef.current.map((s) => ({
+        ...s,
+        chargers: s.chargers.map((c) => tickCharger(c, nextDay, config)),
+      }))
+
+      const prevStations = stationsRef.current
+      const tickedStations = prevStations.map((s) => ({
+        ...s,
+        chargers: s.chargers.map((c) => tickCharger(c, nextDay, config)),
+      }))
+
+      // Check if any charger has issues
+      const hasIncident = tickedStations.some(s =>
+        s.chargers.some(c => c.status === 'failed' || c.status === 'derated' || c.status === 'partially_operational')
+      )
+
+      // Update stations in state (this also triggers bindStations via the useEffect)
+      setStations(tickedStations)
+      syncStations(tickedStations)
+      setCurrentDay(nextDay)
+
+      if (hasIncident && !llmInFlightRef.current) {
+        // Slow mode: call the ReAct agent with tools
+        llmInFlightRef.current = true
+        runGridAgent(nextDay).then(result => {
+          setGridSummary(result.summary)
+          setAgentEvents((prev) => {
+            const next = [...prev, ...result.events]
+            return next.length > 50 ? next.slice(-50) : next
+          })
+          llmInFlightRef.current = false
         })
-        return next
-      })
-    }, intervalMs)
-    return () => clearInterval(id)
-  }, [isRunning, speed, config])
+      }
+
+      // Schedule next tick: fast if healthy, slow if incident
+      const nextMs = hasIncident ? SLOW_MS : FAST_MS
+      tickIntervalRef.current = setTimeout(doTick, nextMs)
+    }
+
+    // Kick off the first tick
+    tickIntervalRef.current = setTimeout(doTick, FAST_MS)
+
+    return () => {
+      if (tickIntervalRef.current) clearTimeout(tickIntervalRef.current)
+    }
+  }, [isRunning, config])
 
   return (
     <ErrorBoundary>
@@ -285,82 +314,87 @@ export function DavisPage() {
                   marginBottom: 8,
                 }}
               >
-                Average P_fail vs days (0–1000, real-time)
+                Average P_fail vs days (0–50, real-time)
               </div>
               <div style={{ flex: 1, minHeight: 0, position: 'relative', pointerEvents: 'auto' }}>
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={pfailHistory} margin={{ top: 8, right: 24, left: 8, bottom: 8 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
-                  <XAxis
-                    type="number"
-                    dataKey="day"
-                    domain={[0, 1000]}
-                    ticks={[0, 200, 400, 600, 800, 1000]}
-                    tick={{ fontSize: 11, fill: '#a0a0a0' }}
-                    stroke="rgba(255,255,255,0.2)"
-                  />
-                  <YAxis
-                    type="number"
-                    dataKey="avgPfailNoAgent"
-                    domain={graphYDomain}
-                    tick={{ fontSize: 11, fill: '#a0a0a0' }}
-                    tickFormatter={(v) =>
-                      (typeof v === 'number' ? (v * 100).toFixed(3) + '%' : String(v))
-                    }
-                    stroke="rgba(255,255,255,0.2)"
-                  />
-                  <RechartsTooltip
-                    contentStyle={{
-                      background: 'rgba(20,20,24,0.98)',
-                      border: '1px solid rgba(255,255,255,0.1)',
-                      fontSize: 12,
-                    }}
-                    formatter={(value: number) =>
-                      typeof value === 'number' ? (value * 100).toFixed(4) + '%' : String(value)
-                    }
-                    labelFormatter={(label) => `Day ${label}`}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="avgPfail"
-                    name="With agent"
-                    stroke="#3b82f6"
-                    strokeWidth={2}
-                    dot={false}
-                    connectNulls
-                    isAnimationActive={false}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="avgPfailNoAgent"
-                    name="No agent"
-                    stroke="#ef4444"
-                    strokeWidth={2}
-                    dot={false}
-                    connectNulls
-                    isAnimationActive={false}
-                  />
-                  <Legend wrapperStyle={{ fontSize: 11 }} />
-                </LineChart>
-              </ResponsiveContainer>
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={pfailHistory} margin={{ top: 8, right: 24, left: 8, bottom: 8 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                    <XAxis
+                      type="number"
+                      dataKey="day"
+                      domain={[0, 50]}
+                      ticks={[0, 10, 20, 30, 40, 50]}
+                      tick={{ fontSize: 11, fill: '#a0a0a0' }}
+                      stroke="rgba(255,255,255,0.2)"
+                    />
+                    <YAxis
+                      type="number"
+                      dataKey="avgPfailNoAgent"
+                      domain={graphYDomain}
+                      tick={{ fontSize: 11, fill: '#a0a0a0' }}
+                      tickFormatter={(v) =>
+                        (typeof v === 'number' ? (v * 100).toFixed(3) + '%' : String(v))
+                      }
+                      stroke="rgba(255,255,255,0.2)"
+                    />
+                    <RechartsTooltip
+                      contentStyle={{
+                        background: 'rgba(20,20,24,0.98)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        fontSize: 12,
+                      }}
+                      formatter={(value: number) =>
+                        typeof value === 'number' ? (value * 100).toFixed(4) + '%' : String(value)
+                      }
+                      labelFormatter={(label) => `Day ${label}`}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="avgPfail"
+                      name="With agent"
+                      stroke="#3b82f6"
+                      strokeWidth={2}
+                      dot={false}
+                      connectNulls
+                      isAnimationActive={false}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="avgPfailNoAgent"
+                      name="No agent"
+                      stroke="#ef4444"
+                      strokeWidth={2}
+                      dot={false}
+                      connectNulls
+                      isAnimationActive={false}
+                    />
+                    <Legend wrapperStyle={{ fontSize: 11 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-          </div>
           </>
         )}
         <Tooltip station={hoveredStation} currentDay={currentDay} x={pointer.x} y={pointer.y} />
         <div
           style={{
             position: 'fixed',
-            top: 20,
+            top: 16,
             right: 16,
             zIndex: 9999,
             display: 'flex',
             flexDirection: 'column',
             gap: 8,
-            maxWidth: 320,
+            width: 400,
+            maxHeight: '85vh',
+            pointerEvents: 'none',
           }}
         >
-          <AgentActivityFeed isRunning={isRunning} />
+          <AgentActivityPanel
+            events={agentEvents}
+            gridSummary={gridSummary}
+          />
         </div>
         <div
           style={{
@@ -391,91 +425,141 @@ export function DavisPage() {
   )
 }
 
-function AgentActivityFeed({ isRunning: _isRunning }: { isRunning: boolean }) {
-  const [logs, setLogs] = useState<{ time: string; source: string; message: string }[]>([])
+function AgentActivityPanel({ events, gridSummary }: { events: AgentEvent[], gridSummary: string }) {
+  const [visibleIds, setVisibleIds] = useState<Set<string>>(new Set())
+  const [fadingIds, setFadingIds] = useState<Set<string>>(new Set())
+  const processedRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
-    const fetchLogs = () => {
-      fetch('/api/agent-logs')
-        .then(r => r.json())
-        .then(data => {
-          if (Array.isArray(data)) setLogs(data)
-        })
-        .catch(() => {})
+    const newEvents = events.filter(e => !processedRef.current.has(e.id))
+    if (newEvents.length === 0) return
+
+    const newIds = new Set<string>()
+    newEvents.forEach(e => {
+      processedRef.current.add(e.id)
+      newIds.add(e.id)
+    })
+
+    setVisibleIds(prev => {
+      const next = new Set(prev)
+      newIds.forEach(id => next.add(id))
+      return next
+    })
+
+    const fadeTimer = setTimeout(() => {
+      setFadingIds(prev => {
+        const next = new Set(prev)
+        newIds.forEach(id => next.add(id))
+        return next
+      })
+    }, 8000)
+
+    const removeTimer = setTimeout(() => {
+      setVisibleIds(prev => {
+        const next = new Set(prev)
+        newIds.forEach(id => next.delete(id))
+        return next
+      })
+      setFadingIds(prev => {
+        const next = new Set(prev)
+        newIds.forEach(id => next.delete(id))
+        return next
+      })
+    }, 10000)
+
+    return () => {
+      clearTimeout(fadeTimer)
+      clearTimeout(removeTimer)
     }
+  }, [events])
 
-    fetchLogs()
-    const id = setInterval(fetchLogs, 2000)
-    return () => clearInterval(id)
-  }, [])
+  const visibleEvents = events.filter(e => visibleIds.has(e.id)).reverse()
 
-  const recentLogs = logs.slice(-3).reverse()
-  const isCriticalOrFailed = (msg: string) => /CRITICAL|FAILED/i.test(msg)
+  const statusColor = (s: AgentEvent['status']) =>
+    s === 'success' ? '#22c55e' : s === 'warning' ? '#eab308' : s === 'error' ? '#ef4444' : '#3b82f6'
+
+  const statusBg = (s: AgentEvent['status']) =>
+    s === 'success' ? 'rgba(34,197,94,0.1)' : s === 'warning' ? 'rgba(234,179,8,0.1)' : s === 'error' ? 'rgba(239,68,68,0.1)' : 'rgba(59,130,246,0.1)'
 
   return (
     <>
+      <style>{`
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to   { transform: translateX(0);    opacity: 1; }
+        }
+        @keyframes fadeOutRight {
+          from { transform: translateX(0);    opacity: 1; }
+          to   { transform: translateX(40px); opacity: 0; }
+        }
+        .agent-notif-enter {
+          animation: slideInRight 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        .agent-notif-exit {
+          animation: fadeOutRight 2s ease forwards;
+        }
+      `}</style>
+
+      {/* Grid Governor LLM Summary — always visible */}
       <div
         style={{
-          fontFamily: 'system-ui, -apple-system, sans-serif',
-          fontWeight: 700,
-          fontSize: 12,
-          letterSpacing: '0.08em',
-          color: '#ffffff',
-          marginBottom: 6,
+          padding: '12px 14px',
+          borderRadius: 10,
+          background: 'rgba(20, 20, 24, 0.95)',
+          border: '1px solid rgba(59, 130, 246, 0.3)',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
+          backdropFilter: 'blur(12px)',
+          pointerEvents: 'auto',
         }}
       >
-        AGENT LOGS
+        <div style={{ fontWeight: 700, fontSize: 12, color: '#3b82f6', letterSpacing: '0.06em', marginBottom: 4 }}>
+          🤖 GRID GOVERNOR AGENT
+        </div>
+        <div style={{ fontSize: 12, color: '#d1d5db', lineHeight: 1.5 }}>
+          {gridSummary}
+        </div>
       </div>
-      {recentLogs.map((log, i) => (
+
+      {/* Push notifications for agent actions */}
+      {visibleEvents.map((e) => (
         <div
-          key={`${log.time}-${i}-${log.message.slice(0, 20)}`}
-          className="agent-log-entry"
+          key={e.id}
+          className={fadingIds.has(e.id) ? 'agent-notif-exit' : 'agent-notif-enter'}
           style={{
-            padding: '10px 12px',
-            borderRadius: 8,
-            background: 'rgba(30, 30, 34, 0.4)',
-            border: '1px solid rgba(255, 255, 255, 0.2)',
-            display: 'flex',
-            gap: 8,
-            alignItems: 'flex-start',
+            padding: e.source === 'thinking' ? '8px 12px' : '10px 12px',
+            borderRadius: 10,
+            background: e.source === 'thinking' ? 'rgba(88, 28, 135, 0.15)' : statusBg(e.status),
+            border: `1px solid ${e.source === 'thinking' ? 'rgba(168, 85, 247, 0.3)' : statusColor(e.status) + '33'}`,
+            boxShadow: '0 4px 20px rgba(0,0,0,0.35)',
+            backdropFilter: 'blur(12px)',
+            fontSize: e.source === 'thinking' ? 11 : 12,
+            fontStyle: e.source === 'thinking' ? 'italic' : 'normal',
+            color: e.source === 'thinking' ? '#c4b5fd' : '#e8e8e8',
+            lineHeight: 1.4,
+            pointerEvents: 'auto',
           }}
         >
-          {isCriticalOrFailed(log.message) && (
-            <span
-              style={{
-                flexShrink: 0,
-                color: '#facc15',
-                fontSize: 16,
-                lineHeight: 1,
-              }}
-              aria-hidden
-            >
-              ⚠
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span style={{
+                width: 8, height: 8, borderRadius: '50%', display: 'inline-block',
+                background: statusColor(e.status),
+                boxShadow: `0 0 6px ${statusColor(e.status)}`,
+              }} />
+              <strong style={{ color: '#fff', fontSize: 13 }}>{e.action}</strong>
+            </div>
+            <span style={{
+              fontSize: 10,
+              padding: '2px 6px',
+              borderRadius: 4,
+              fontWeight: 600,
+              color: statusColor(e.status),
+              background: `${statusColor(e.status)}22`,
+            }}>
+              {e.source.toUpperCase()}
             </span>
-          )}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div
-              style={{
-                fontSize: 10,
-                color: 'rgba(255, 255, 255, 0.55)',
-                marginBottom: 4,
-                fontFamily: 'system-ui, -apple-system, sans-serif',
-              }}
-            >
-              {log.time} · AGENT
-            </div>
-            <div
-              style={{
-                fontWeight: 700,
-                fontSize: 13,
-                color: '#ffffff',
-                lineHeight: 1.4,
-                fontFamily: 'system-ui, -apple-system, sans-serif',
-              }}
-            >
-              {log.message}
-            </div>
           </div>
+          <div style={{ color: '#d1d5db' }}>{e.detail}</div>
         </div>
       ))}
     </>

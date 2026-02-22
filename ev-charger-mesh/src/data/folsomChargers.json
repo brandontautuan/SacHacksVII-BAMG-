@@ -1,0 +1,422 @@
+[
+  {
+    "id": "folsom-001",
+    "latitude": 38.6766,
+    "longitude": -121.1796,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-002",
+    "latitude": 38.6731,
+    "longitude": -121.167,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-003",
+    "latitude": 38.6764,
+    "longitude": -121.1988,
+    "power_kw": 150,
+    "charger_type": "DC Fast"
+  },
+  {
+    "id": "folsom-004",
+    "latitude": 38.657,
+    "longitude": -121.1869,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-005",
+    "latitude": 38.6909,
+    "longitude": -121.1508,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-006",
+    "latitude": 38.691,
+    "longitude": -121.1507,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-007",
+    "latitude": 38.6914,
+    "longitude": -121.1504,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-008",
+    "latitude": 38.6915,
+    "longitude": -121.1503,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-009",
+    "latitude": 38.6915,
+    "longitude": -121.1503,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-010",
+    "latitude": 38.671,
+    "longitude": -121.1449,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-011",
+    "latitude": 38.7039,
+    "longitude": -121.1691,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-012",
+    "latitude": 38.6519,
+    "longitude": -121.1677,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-013",
+    "latitude": 38.6519,
+    "longitude": -121.1672,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-014",
+    "latitude": 38.6493,
+    "longitude": -121.1663,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-015",
+    "latitude": 38.6489,
+    "longitude": -121.1671,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-016",
+    "latitude": 38.6485,
+    "longitude": -121.1674,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-017",
+    "latitude": 38.6489,
+    "longitude": -121.1646,
+    "power_kw": 150,
+    "charger_type": "DC Fast"
+  },
+  {
+    "id": "folsom-018",
+    "latitude": 38.6485,
+    "longitude": -121.1658,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-019",
+    "latitude": 38.6481,
+    "longitude": -121.1676,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-020",
+    "latitude": 38.6442,
+    "longitude": -121.1875,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-021",
+    "latitude": 38.6442,
+    "longitude": -121.1878,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-022",
+    "latitude": 38.643,
+    "longitude": -121.1886,
+    "power_kw": 150,
+    "charger_type": "DC Fast"
+  },
+  {
+    "id": "folsom-023",
+    "latitude": 38.6423,
+    "longitude": -121.1881,
+    "power_kw": 150,
+    "charger_type": "DC Fast"
+  },
+  {
+    "id": "folsom-024",
+    "latitude": 38.6436,
+    "longitude": -121.1494,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-025",
+    "latitude": 38.6435,
+    "longitude": -121.1496,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-026",
+    "latitude": 38.644,
+    "longitude": -121.1473,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-027",
+    "latitude": 38.644,
+    "longitude": -121.1473,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-028",
+    "latitude": 38.6605,
+    "longitude": -121.128,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-029",
+    "latitude": 38.6373,
+    "longitude": -121.2002,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-030",
+    "latitude": 38.6538,
+    "longitude": -121.1264,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-031",
+    "latitude": 38.6439,
+    "longitude": -121.1343,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-032",
+    "latitude": 38.6557,
+    "longitude": -121.122,
+    "power_kw": 150,
+    "charger_type": "DC Fast"
+  },
+  {
+    "id": "folsom-033",
+    "latitude": 38.6536,
+    "longitude": -121.1233,
+    "power_kw": 150,
+    "charger_type": "DC Fast"
+  },
+  {
+    "id": "folsom-034",
+    "latitude": 38.6533,
+    "longitude": -121.1217,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-035",
+    "latitude": 38.6335,
+    "longitude": -121.2076,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-036",
+    "latitude": 38.6521,
+    "longitude": -121.1189,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-037",
+    "latitude": 38.6521,
+    "longitude": -121.1188,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-038",
+    "latitude": 38.6522,
+    "longitude": -121.1182,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-039",
+    "latitude": 38.6503,
+    "longitude": -121.1186,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-040",
+    "latitude": 38.6504,
+    "longitude": -121.1184,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-041",
+    "latitude": 38.6476,
+    "longitude": -121.1207,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-042",
+    "latitude": 38.6494,
+    "longitude": -121.1176,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-043",
+    "latitude": 38.6472,
+    "longitude": -121.1183,
+    "power_kw": 150,
+    "charger_type": "DC Fast"
+  },
+  {
+    "id": "folsom-044",
+    "latitude": 38.642,
+    "longitude": -121.1211,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-045",
+    "latitude": 38.6423,
+    "longitude": -121.1208,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-046",
+    "latitude": 38.642,
+    "longitude": -121.121,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-047",
+    "latitude": 38.642,
+    "longitude": -121.1209,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-048",
+    "latitude": 38.6419,
+    "longitude": -121.1209,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-049",
+    "latitude": 38.6418,
+    "longitude": -121.1209,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-050",
+    "latitude": 38.6418,
+    "longitude": -121.1208,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-051",
+    "latitude": 38.6416,
+    "longitude": -121.1208,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-052",
+    "latitude": 38.6419,
+    "longitude": -121.1205,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-053",
+    "latitude": 38.6419,
+    "longitude": -121.1205,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-054",
+    "latitude": 38.6372,
+    "longitude": -121.1138,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-055",
+    "latitude": 38.6372,
+    "longitude": -121.1137,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-056",
+    "latitude": 38.6371,
+    "longitude": -121.1138,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-057",
+    "latitude": 38.6366,
+    "longitude": -121.1133,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-058",
+    "latitude": 38.6366,
+    "longitude": -121.1132,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-059",
+    "latitude": 38.6365,
+    "longitude": -121.1132,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "folsom-060",
+    "latitude": 38.6369,
+    "longitude": -121.1119,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  }
+]

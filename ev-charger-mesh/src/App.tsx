@@ -1,12 +1,12 @@
 /**
- * Root app: routing. Landing at /, Davis mesh at /davis, placeholders at /sacramento, /folsom.
+ * Root app: routing. Landing at /, Davis mesh at /davis, Sacramento mesh at /sacramento, Folsom mesh at /folsom.
  */
 
 import { Routes, Route } from 'react-router-dom'
 import { Landing } from '@/pages/Landing'
 import { DavisPage } from '@/pages/DavisPage'
 import { SacramentoPage } from '@/pages/SacramentoPage'
-import { Folsom } from '@/pages/Folsom'
+import { FolsomPage } from '@/pages/FolsomPage'
 
 export default function App() {
   return (
@@ -14,7 +14,7 @@ export default function App() {
       <Route path="/" element={<Landing />} />
       <Route path="/davis" element={<DavisPage />} />
       <Route path="/sacramento" element={<SacramentoPage />} />
-      <Route path="/folsom" element={<Folsom />} />
+      <Route path="/folsom" element={<FolsomPage />} />
     </Routes>
   )
 }

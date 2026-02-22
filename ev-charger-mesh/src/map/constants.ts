@@ -35,3 +35,20 @@ export const SACRAMENTO_VIEW_STATE = {
   pitch: 0,
   bearing: 0,
 } as const
+
+export const FOLSOM_CENTER: [number, number] = [-121.1762, 38.678]
+
+export const FOLSOM_BOUNDS = {
+  minLng: -121.24,
+  maxLng: -121.11,
+  minLat: 38.62,
+  maxLat: 38.73,
+} as const
+
+export const FOLSOM_VIEW_STATE = {
+  longitude: FOLSOM_CENTER[0],
+  latitude: FOLSOM_CENTER[1],
+  zoom: 12.5,
+  pitch: 0,
+  bearing: 0,
+} as const

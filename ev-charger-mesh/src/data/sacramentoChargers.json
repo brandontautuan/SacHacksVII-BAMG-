@@ -1,27 +1,562 @@
 [
-  {"id":"sacramento-001","latitude":38.5812,"longitude":-121.4938,"power_kw":150,"charger_type":"DC Fast"},
-  {"id":"sacramento-002","latitude":38.5798,"longitude":-121.4922,"power_kw":50,"charger_type":"Level 2"},
-  {"id":"sacramento-003","latitude":38.5835,"longitude":-121.4965,"power_kw":62,"charger_type":"Level 2"},
-  {"id":"sacramento-004","latitude":38.5778,"longitude":-121.4889,"power_kw":350,"charger_type":"DC Fast"},
-  {"id":"sacramento-005","latitude":38.5852,"longitude":-121.5012,"power_kw":22,"charger_type":"Level 1"},
-  {"id":"sacramento-006","latitude":38.5752,"longitude":-121.5089,"power_kw":50,"charger_type":"Level 2"},
-  {"id":"sacramento-007","latitude":38.5878,"longitude":-121.4856,"power_kw":150,"charger_type":"DC Fast"},
-  {"id":"sacramento-008","latitude":38.5805,"longitude":-121.5045,"power_kw":62,"charger_type":"Level 2"},
-  {"id":"sacramento-009","latitude":38.5762,"longitude":-121.4978,"power_kw":22,"charger_type":"Level 1"},
-  {"id":"sacramento-010","latitude":38.5845,"longitude":-121.4912,"power_kw":50,"charger_type":"Level 2"},
-  {"id":"sacramento-011","latitude":38.5785,"longitude":-121.5078,"power_kw":62,"charger_type":"Level 2"},
-  {"id":"sacramento-012","latitude":38.5828,"longitude":-121.4945,"power_kw":150,"charger_type":"DC Fast"},
-  {"id":"sacramento-013","latitude":38.5745,"longitude":-121.4865,"power_kw":22,"charger_type":"Level 1"},
-  {"id":"sacramento-014","latitude":38.5865,"longitude":-121.4982,"power_kw":50,"charger_type":"Level 2"},
-  {"id":"sacramento-015","latitude":38.5732,"longitude":-121.5032,"power_kw":350,"charger_type":"DC Fast"},
-  {"id":"sacramento-016","latitude":38.5882,"longitude":-121.5095,"power_kw":62,"charger_type":"Level 2"},
-  {"id":"sacramento-017","latitude":38.5712,"longitude":-121.4956,"power_kw":50,"charger_type":"Level 2"},
-  {"id":"sacramento-018","latitude":38.5842,"longitude":-121.5078,"power_kw":22,"charger_type":"Level 1"},
-  {"id":"sacramento-019","latitude":38.5772,"longitude":-121.5012,"power_kw":150,"charger_type":"DC Fast"},
-  {"id":"sacramento-020","latitude":38.5758,"longitude":-121.4895,"power_kw":62,"charger_type":"Level 2"},
-  {"id":"sacramento-021","latitude":38.5895,"longitude":-121.4932,"power_kw":50,"charger_type":"Level 2"},
-  {"id":"sacramento-022","latitude":38.5722,"longitude":-121.4998,"power_kw":22,"charger_type":"Level 1"},
-  {"id":"sacramento-023","latitude":38.5858,"longitude":-121.4956,"power_kw":62,"charger_type":"Level 2"},
-  {"id":"sacramento-024","latitude":38.5795,"longitude":-121.5105,"power_kw":150,"charger_type":"DC Fast"},
-  {"id":"sacramento-025","latitude":38.5738,"longitude":-121.5062,"power_kw":50,"charger_type":"Level 2"}
+  {
+    "id": "sacramento-001",
+    "latitude": 38.5809,
+    "longitude": -121.4955,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-002",
+    "latitude": 38.5811,
+    "longitude": -121.493,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-003",
+    "latitude": 38.581,
+    "longitude": -121.493,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-004",
+    "latitude": 38.5812,
+    "longitude": -121.4929,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-005",
+    "latitude": 38.5811,
+    "longitude": -121.493,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-006",
+    "latitude": 38.581,
+    "longitude": -121.493,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-007",
+    "latitude": 38.581,
+    "longitude": -121.493,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-008",
+    "latitude": 38.5811,
+    "longitude": -121.493,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-009",
+    "latitude": 38.5809,
+    "longitude": -121.4931,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-010",
+    "latitude": 38.581,
+    "longitude": -121.493,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-011",
+    "latitude": 38.581,
+    "longitude": -121.4929,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-012",
+    "latitude": 38.5809,
+    "longitude": -121.493,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-013",
+    "latitude": 38.581,
+    "longitude": -121.4929,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-014",
+    "latitude": 38.5811,
+    "longitude": -121.4926,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-015",
+    "latitude": 38.581,
+    "longitude": -121.4927,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-016",
+    "latitude": 38.5811,
+    "longitude": -121.4926,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-017",
+    "latitude": 38.5809,
+    "longitude": -121.4925,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-018",
+    "latitude": 38.581,
+    "longitude": -121.4925,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-019",
+    "latitude": 38.581,
+    "longitude": -121.4924,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-020",
+    "latitude": 38.581,
+    "longitude": -121.4923,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-021",
+    "latitude": 38.5809,
+    "longitude": -121.4923,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-022",
+    "latitude": 38.5835,
+    "longitude": -121.4959,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-023",
+    "latitude": 38.5836,
+    "longitude": -121.496,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-024",
+    "latitude": 38.5836,
+    "longitude": -121.496,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-025",
+    "latitude": 38.5836,
+    "longitude": -121.4962,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-026",
+    "latitude": 38.5837,
+    "longitude": -121.4961,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-027",
+    "latitude": 38.5837,
+    "longitude": -121.4961,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-028",
+    "latitude": 38.5837,
+    "longitude": -121.4961,
+    "power_kw": 150,
+    "charger_type": "DC Fast"
+  },
+  {
+    "id": "sacramento-029",
+    "latitude": 38.5838,
+    "longitude": -121.4961,
+    "power_kw": 150,
+    "charger_type": "DC Fast"
+  },
+  {
+    "id": "sacramento-030",
+    "latitude": 38.5838,
+    "longitude": -121.4963,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-031",
+    "latitude": 38.5841,
+    "longitude": -121.4954,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-032",
+    "latitude": 38.5838,
+    "longitude": -121.4963,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-033",
+    "latitude": 38.5836,
+    "longitude": -121.4919,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-034",
+    "latitude": 38.5844,
+    "longitude": -121.4956,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-035",
+    "latitude": 38.5785,
+    "longitude": -121.4939,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-036",
+    "latitude": 38.5846,
+    "longitude": -121.4934,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-037",
+    "latitude": 38.5785,
+    "longitude": -121.4938,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-038",
+    "latitude": 38.5784,
+    "longitude": -121.4939,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-039",
+    "latitude": 38.5816,
+    "longitude": -121.4987,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-040",
+    "latitude": 38.5817,
+    "longitude": -121.4988,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-041",
+    "latitude": 38.5783,
+    "longitude": -121.4931,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-042",
+    "latitude": 38.5817,
+    "longitude": -121.4989,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-043",
+    "latitude": 38.5782,
+    "longitude": -121.4931,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-044",
+    "latitude": 38.5782,
+    "longitude": -121.4931,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-045",
+    "latitude": 38.5809,
+    "longitude": -121.4989,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-046",
+    "latitude": 38.5817,
+    "longitude": -121.499,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-047",
+    "latitude": 38.5781,
+    "longitude": -121.4931,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-048",
+    "latitude": 38.5852,
+    "longitude": -121.4954,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-049",
+    "latitude": 38.5818,
+    "longitude": -121.4991,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-050",
+    "latitude": 38.5853,
+    "longitude": -121.4955,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-051",
+    "latitude": 38.5818,
+    "longitude": -121.4992,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-052",
+    "latitude": 38.5853,
+    "longitude": -121.4955,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-053",
+    "latitude": 38.582,
+    "longitude": -121.4895,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-054",
+    "latitude": 38.5818,
+    "longitude": -121.4894,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-055",
+    "latitude": 38.582,
+    "longitude": -121.4894,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-056",
+    "latitude": 38.5815,
+    "longitude": -121.4995,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-057",
+    "latitude": 38.5818,
+    "longitude": -121.4893,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-058",
+    "latitude": 38.5819,
+    "longitude": -121.4893,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-059",
+    "latitude": 38.5791,
+    "longitude": -121.4988,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-060",
+    "latitude": 38.5792,
+    "longitude": -121.499,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-061",
+    "latitude": 38.5786,
+    "longitude": -121.4901,
+    "power_kw": 150,
+    "charger_type": "DC Fast"
+  },
+  {
+    "id": "sacramento-062",
+    "latitude": 38.5785,
+    "longitude": -121.4901,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-063",
+    "latitude": 38.5785,
+    "longitude": -121.4901,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-064",
+    "latitude": 38.5787,
+    "longitude": -121.499,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-065",
+    "latitude": 38.5778,
+    "longitude": -121.4909,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-066",
+    "latitude": 38.5783,
+    "longitude": -121.4901,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-067",
+    "latitude": 38.5783,
+    "longitude": -121.49,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-068",
+    "latitude": 38.5785,
+    "longitude": -121.4991,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-069",
+    "latitude": 38.5776,
+    "longitude": -121.4908,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-070",
+    "latitude": 38.5812,
+    "longitude": -121.5009,
+    "power_kw": 150,
+    "charger_type": "DC Fast"
+  },
+  {
+    "id": "sacramento-071",
+    "latitude": 38.5813,
+    "longitude": -121.5009,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-072",
+    "latitude": 38.5787,
+    "longitude": -121.4998,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-073",
+    "latitude": 38.5797,
+    "longitude": -121.488,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-074",
+    "latitude": 38.5795,
+    "longitude": -121.5009,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-075",
+    "latitude": 38.5795,
+    "longitude": -121.5009,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-076",
+    "latitude": 38.5779,
+    "longitude": -121.5009,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-077",
+    "latitude": 38.5803,
+    "longitude": -121.4863,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-078",
+    "latitude": 38.5804,
+    "longitude": -121.4862,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-079",
+    "latitude": 38.5804,
+    "longitude": -121.4862,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  },
+  {
+    "id": "sacramento-080",
+    "latitude": 38.5803,
+    "longitude": -121.4862,
+    "power_kw": 62,
+    "charger_type": "Level 2"
+  }
 ]

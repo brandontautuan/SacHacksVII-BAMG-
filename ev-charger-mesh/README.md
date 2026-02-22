@@ -40,4 +40,7 @@ React + TypeScript + Vite app that visualizes a geospatial network of EV chargin
 
 ## Data
 
-Chargers are loaded from `src/data/chargers.json`. Each record has `id`, `latitude`, `longitude`, `power_kw`, `charger_type`. The mesh connects each charger to its 3 nearest neighbors (Haversine); edges are stored as source → target coordinate pairs and deduplicated.
+Chargers are loaded from `src/data/chargers.json` (Davis), `sacramentoChargers.json`, and `folsomChargers.json`. Each record has `id`, `latitude`, `longitude`, `power_kw`, `charger_type`. The mesh connects each station to its 3 nearest neighbors (Haversine); edges are stored as source → target coordinate pairs and deduplicated.
+
+- **Davis** — `chargers.json` (curated locations).
+- **Sacramento & Folsom** — Real locations from the [NREL Alternative Fuel Data Center (AFDC)](https://afdc.energy.gov/) API (same source as the [Station Locator](https://afdc.energy.gov/stations/)). To refresh: `node scripts/fetch-nrel-chargers.js` (uses `DEMO_KEY` or `NREL_API_KEY` env).

@@ -11,15 +11,16 @@
     "validate-failure-model": "npx tsx src/sim/runDiagnostics.ts"
   },
   "dependencies": {
-    "maplibre-gl": "^4.7.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "deck.gl": "^9.0.0",
     "@deck.gl/core": "^9.0.0",
     "@deck.gl/layers": "^9.0.0",
     "@deck.gl/mapbox": "^9.0.0",
     "@deck.gl/react": "^9.0.0",
-    "react-map-gl": "^7.1.7"
+    "deck.gl": "^9.0.0",
+    "maplibre-gl": "^4.7.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-map-gl": "^7.1.7",
+    "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.13.0",

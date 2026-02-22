@@ -12,6 +12,16 @@ import { buildScatterLayer, buildLineLayer } from './layers'
 import { DAVIS_BOUNDS, INITIAL_VIEW_STATE } from './constants'
 import type { Station, EdgeCoords } from '@/data/types'
 
+export type MapViewState = {
+  longitude: number
+  latitude: number
+  zoom: number
+  pitch: number
+  bearing: number
+}
+
+export type MapBounds = [[number, number], [number, number]]
+
 /** Free OSM vector styles (no API key). Primary: Carto dark. Fallback: MapLibre demo. */
 const MAP_STYLE_DARK =
   'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
@@ -28,6 +38,9 @@ export interface MapViewProps {
   onHover: (station: Station | null, coords: { x: number; y: number }) => void
   /** Called when the user clicks on the map (e.g. to close a pop-out). */
   onMapClick?: () => void
+  /** Override initial view and bounds (e.g. for Sacramento). Defaults to Davis. */
+  viewState?: MapViewState
+  maxBounds?: MapBounds
 }
 
 export function MapView({
@@ -39,6 +52,11 @@ export function MapView({
   selectedStationId = null,
   onHover,
   onMapClick,
+  viewState = INITIAL_VIEW_STATE,
+  maxBounds = [
+    [DAVIS_BOUNDS.minLng, DAVIS_BOUNDS.minLat],
+    [DAVIS_BOUNDS.maxLng, DAVIS_BOUNDS.maxLat],
+  ],
 }: MapViewProps) {
   const mapRef = useRef<MapRef>(null)
   const mapInstanceRef = useRef<MapLibreMap | null>(null)
@@ -70,12 +88,12 @@ export function MapView({
     const map = mapInstanceRef.current ?? mapRef.current?.getMap?.()
     if (!map) return
     map.flyTo({
-      center: [INITIAL_VIEW_STATE.longitude, INITIAL_VIEW_STATE.latitude],
-      zoom: INITIAL_VIEW_STATE.zoom,
-      pitch: INITIAL_VIEW_STATE.pitch,
-      bearing: INITIAL_VIEW_STATE.bearing,
+      center: [viewState.longitude, viewState.latitude],
+      zoom: viewState.zoom,
+      pitch: viewState.pitch,
+      bearing: viewState.bearing,
     })
-  }, [resetTrigger])
+  }, [resetTrigger, viewState])
 
   const onLoad = useCallback(
     (ev: { target: MapLibreMap }) => {
@@ -127,15 +145,12 @@ export function MapView({
     >
       <Map
         ref={mapRef}
-        initialViewState={INITIAL_VIEW_STATE}
+        initialViewState={viewState}
         onLoad={onLoad}
         onError={onError}
         mapStyle={mapStyle}
         style={{ width: '100%', height: '100%' }}
-        maxBounds={[
-          [DAVIS_BOUNDS.minLng, DAVIS_BOUNDS.minLat],
-          [DAVIS_BOUNDS.maxLng, DAVIS_BOUNDS.maxLat],
-        ]}
+        maxBounds={maxBounds}
         dragPan={false}
         dragRotate={false}
         scrollZoom={true}

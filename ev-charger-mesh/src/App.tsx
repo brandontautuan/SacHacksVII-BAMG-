@@ -5,7 +5,7 @@
 import { Routes, Route } from 'react-router-dom'
 import { Landing } from '@/pages/Landing'
 import { DavisPage } from '@/pages/DavisPage'
-import { Sacramento } from '@/pages/Sacramento'
+import { SacramentoPage } from '@/pages/SacramentoPage'
 import { Folsom } from '@/pages/Folsom'
 
 export default function App() {
@@ -13,7 +13,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Landing />} />
       <Route path="/davis" element={<DavisPage />} />
-      <Route path="/sacramento" element={<Sacramento />} />
+      <Route path="/sacramento" element={<SacramentoPage />} />
       <Route path="/folsom" element={<Folsom />} />
     </Routes>
   )

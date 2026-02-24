@@ -1,4 +1,4 @@
-# 🤖 The Grid Governor: Autonomous EV Mesh Maintenance
+# 🤖 EVIncible
 
 **Autonomous Grid Governance for the Modern EV Infrastructure.**  
 Built for SacHacks VII, The Grid Governor is a multi-agent system designed to eliminate "maintenance dead-zones" in electric vehicle charging networks using high-performance digital twins and LLM-powered autonomous repair agents.
